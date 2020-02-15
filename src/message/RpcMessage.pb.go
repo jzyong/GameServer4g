@@ -4,8 +4,12 @@
 package message
 
 import (
+	context "context"
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	math "math"
 )
 
@@ -76,4 +80,120 @@ var fileDescriptor_a49baf2e5143a5e0 = []byte{
 	0x90, 0x26, 0xe7, 0x9c, 0xfc, 0xe2, 0x54, 0x52, 0x34, 0x39, 0x49, 0x71, 0xf1, 0xe7, 0x17, 0xa5,
 	0xeb, 0xe5, 0xe6, 0xe6, 0xeb, 0xe5, 0x42, 0x64, 0xa2, 0xd8, 0xa1, 0x8c, 0x24, 0x36, 0xb0, 0x57,
 	0x8c, 0x01, 0x01, 0x00, 0x00, 0xff, 0xff, 0xf5, 0x23, 0xf1, 0xc4, 0xde, 0x00, 0x00, 0x00,
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConnInterface
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion6
+
+// HelloServiceClient is the client API for HelloService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type HelloServiceClient interface {
+	Hello(ctx context.Context, in *String, opts ...grpc.CallOption) (*String, error)
+	Close(ctx context.Context, in *String, opts ...grpc.CallOption) (*String, error)
+}
+
+type helloServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewHelloServiceClient(cc grpc.ClientConnInterface) HelloServiceClient {
+	return &helloServiceClient{cc}
+}
+
+func (c *helloServiceClient) Hello(ctx context.Context, in *String, opts ...grpc.CallOption) (*String, error) {
+	out := new(String)
+	err := c.cc.Invoke(ctx, "/ProtoMessage.HelloService/Hello", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *helloServiceClient) Close(ctx context.Context, in *String, opts ...grpc.CallOption) (*String, error) {
+	out := new(String)
+	err := c.cc.Invoke(ctx, "/ProtoMessage.HelloService/Close", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// HelloServiceServer is the server API for HelloService service.
+type HelloServiceServer interface {
+	Hello(context.Context, *String) (*String, error)
+	Close(context.Context, *String) (*String, error)
+}
+
+// UnimplementedHelloServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedHelloServiceServer struct {
+}
+
+func (*UnimplementedHelloServiceServer) Hello(ctx context.Context, req *String) (*String, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
+}
+func (*UnimplementedHelloServiceServer) Close(ctx context.Context, req *String) (*String, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Close not implemented")
+}
+
+func RegisterHelloServiceServer(s *grpc.Server, srv HelloServiceServer) {
+	s.RegisterService(&_HelloService_serviceDesc, srv)
+}
+
+func _HelloService_Hello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(String)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelloServiceServer).Hello(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ProtoMessage.HelloService/Hello",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelloServiceServer).Hello(ctx, req.(*String))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HelloService_Close_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(String)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HelloServiceServer).Close(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ProtoMessage.HelloService/Close",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HelloServiceServer).Close(ctx, req.(*String))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _HelloService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ProtoMessage.HelloService",
+	HandlerType: (*HelloServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Hello",
+			Handler:    _HelloService_Hello_Handler,
+		},
+		{
+			MethodName: "Close",
+			Handler:    _HelloService_Close_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "RpcMessage.proto",
 }

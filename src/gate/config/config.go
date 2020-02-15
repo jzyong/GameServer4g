@@ -46,4 +46,7 @@ var GateConfig struct {
 	LogFileName string "gate"
 	//日志级别
 	LogLevel string "debug"
+
+	//gate rpc地址
+	ClusterRpcURL string
 }
