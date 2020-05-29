@@ -1,8 +1,8 @@
 package config
 
 import (
-	"core/log"
 	"encoding/json"
+	"github.com/jzyong/go-mmo-server/src/core/log"
 	"io/ioutil"
 	innerLog "log"
 )

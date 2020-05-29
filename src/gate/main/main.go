@@ -1,8 +1,8 @@
 package main
 
 import (
-	"gate/config"
-	"gate/rpc"
+	"github.com/jzyong/go-mmo-server/src/gate/config"
+	"github.com/jzyong/go-mmo-server/src/gate/rpc"
 	"log"
 )
 

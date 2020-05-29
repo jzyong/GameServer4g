@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/jzy/go-mmo-server/src/message"
+	"github.com/jzyong/go-mmo-server/src/message"
 	"log"
 	"net"
 	"net/rpc"

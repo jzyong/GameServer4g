@@ -2,10 +2,10 @@ package rpc
 
 import (
 	"context"
-	"gate/config"
+	"github.com/jzyong/go-mmo-server/src/gate/config"
+	"github.com/jzyong/go-mmo-server/src/message"
 	"google.golang.org/grpc"
 	"log"
-	"message"
 	"time"
 )
 

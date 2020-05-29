@@ -2,7 +2,7 @@ package test
 
 import (
 	"github.com/golang/protobuf/proto"
-	"github.com/jzy/go-mmo-server/src/message"
+	"github.com/jzyong/go-mmo-server/src/message"
 	"log"
 	"testing"
 )
