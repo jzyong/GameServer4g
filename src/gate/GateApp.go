@@ -7,9 +7,10 @@ import (
 )
 
 func main() {
-	log.Printf("gate:%d starting", config.GateConfig.Id)
+	log.Printf("gate:%d starting", config.GateConfigInstance.Id)
 
 	rpc.GateToClusterClient = new(rpc.GateToCluster)
-	rpc.GateToClusterClient.Start(config.GateConfig.ClusterRpcURL)
+	rpc.GateToClusterClient.Start(config.GateConfigInstance.ClusterRpcURL)
 	rpc.RegisterToCluster()
+	select {}
 }

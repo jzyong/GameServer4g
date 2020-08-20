@@ -38,8 +38,8 @@ func RegisterToCluster() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	result, err := client.ServerRegister(ctx, &message.ServerInfo{
-		Id:                   config.GateConfig.Id,
-		BelongID:             config.GateConfig.Id,
+		Id:                   config.GateConfigInstance.Id,
+		BelongID:             config.GateConfigInstance.Id,
 		Ip:                   "localhost",
 		Type:                 2,
 		Port:                 80,
@@ -58,7 +58,7 @@ func RegisterToCluster() {
 		XXX_sizecache:        0,
 	})
 	if err != nil {
-		log.Fatal("%v", err)
+		log.Printf("%v", err)
 	}
 	log.Printf("%s", result)
 }
