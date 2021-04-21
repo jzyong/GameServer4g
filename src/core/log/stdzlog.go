@@ -104,6 +104,6 @@ func Stack(v ...interface{}) {
 
 func init() {
 	//因为StdZinxLog对象 对所有输出方法做了一层包裹，所以在打印调用函数的时候，比正常的logger对象多一层调用
-	//一般的zinxLogger对象 calldDepth=2, StdZinxLog的calldDepth=3
-	StdLog.calldDepth = 3
+	//一般的zinxLogger对象 callDepth=2, StdZinxLog的calldDepth=3
+	StdLog.callDepth = 3
 }
