@@ -3,3 +3,4 @@
 #idea 文件
 /.idea/
 *.iml
+/src/gate/GateApp
