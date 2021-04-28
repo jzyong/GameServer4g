@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	"io/ioutil"
 	"os"
@@ -11,14 +10,15 @@ import (
 //网关配置
 var GateConfigInstance *GateConfig
 
+//配置文件路径
+var FilePath string
+
 //网关json配置对象
 type GateConfig struct {
 	//服务器ID
 	Id int32
 	//允许用户连接数
 	UserConnectCount int32
-	//配置文件路径
-	ConfigFilePath string "gate"
 	//日志级别
 	LogLevel string "debug"
 	//日志名称
@@ -31,11 +31,10 @@ func init() {
 	GateConfigInstance = &GateConfig{
 		Id:               2,
 		LogLevel:         "debug",
-		ConfigFilePath:   "config/GateConfig.json",
 		UserConnectCount: 10000,
 		ClusterRpcURL:    "192.168.110.16:2002",
 	}
-	GateConfigInstance.Reload()
+	//GateConfigInstance.Reload()
 }
 
 //判断一个文件是否存在
@@ -52,11 +51,11 @@ func PathExists(path string) (bool, error) {
 
 //读取用户的配置文件
 func (g *GateConfig) Reload() {
-	if confFileExists, _ := PathExists(g.ConfigFilePath); confFileExists != true {
-		fmt.Println("Config File ", g.ConfigFilePath, " is not exist!!")
+	if confFileExists, _ := PathExists(FilePath); confFileExists != true {
+		log.Warn("Config File ", FilePath, " is not exist!!")
 		return
 	}
-	data, err := ioutil.ReadFile(g.ConfigFilePath)
+	data, err := ioutil.ReadFile(FilePath)
 	if err != nil {
 		panic(err)
 	}
