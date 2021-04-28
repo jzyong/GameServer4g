@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"github.com/jzyong/go-mmo-server/src/message"
 	grpc "google.golang.org/grpc"
 	"log"
-	"message"
 	"time"
 )
 

@@ -9,6 +9,7 @@ import (
 
 func main() {
 	log.OpenDebug()
+	//log.SetLogFile("../../log","gate.log") //正式服需要输出到文件
 	log.Debugf("gate:%d starting", config.GateConfigInstance.Id)
 
 	rpc.GateToClusterClient = new(rpc.GateToCluster)
