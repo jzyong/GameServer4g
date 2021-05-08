@@ -5,7 +5,9 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	"github.com/jzyong/go-mmo-server/src/core/util"
 	"github.com/jzyong/go-mmo-server/src/gate/config"
+	"github.com/jzyong/go-mmo-server/src/gate/manager"
 	"github.com/jzyong/go-mmo-server/src/gate/rpc"
+	"runtime"
 )
 
 func main() {
@@ -21,6 +23,17 @@ func main() {
 	rpc.GateToClusterClient = new(rpc.GateToCluster)
 	rpc.GateToClusterClient.Start(config.GateConfigInstance.ClusterRpcURL)
 	rpc.RegisterToCluster()
-	//select {}
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
+
+	var err error
+	err = manager.Module.Init()
+	if err != nil {
+		log.Errorf("gate start error: %s", err.Error())
+		return
+	}
+	manager.Module.Run()
 	util.WaitForTerminate()
+	manager.Module.Stop()
+	log.Info("gate stop")
 }

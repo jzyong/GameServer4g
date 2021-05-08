@@ -30,13 +30,13 @@ func (this DefaultModule) Stop() {
 
 }
 
-//@  DefaultModuleManager default module manager
+//  DefaultModuleManager default module manager
 type DefaultModuleManager struct {
 	Module
 	Modules []Module
 }
 
-//@
+//
 func NewDefaultModuleManager() *DefaultModuleManager {
 	return &DefaultModuleManager{
 		Modules: make([]Module, 0, 5),
