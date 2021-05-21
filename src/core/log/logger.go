@@ -65,7 +65,7 @@ type Logger struct {
 	file *os.File
 	//是否打印调试debug信息
 	debugClose bool
-	//获取日志文件名和代码上述的runtime.Call 的函数调用层数
+	//获取日志文件名和代码上述的runtime.Run 的函数调用层数
 	callDepth int
 }
 
