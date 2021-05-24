@@ -6,12 +6,10 @@ import (
 
 type ModuleManager struct {
 	*util.DefaultModuleManager
-	serverSeq int
-
-	//TODO 添加其他Manager引用
-	//gateManager  *GateManager
-	//gsManager    *GSManager
-	//fightManager *fight.FightManager
+	clientManager *ClientManager
+	gateManager   *GateManager
+	gameManager   *GameManager
+	userManager   *UserManager
 }
 
 var Module = &ModuleManager{
@@ -19,9 +17,9 @@ var Module = &ModuleManager{
 }
 
 func (this *ModuleManager) Init() error {
-	//this.gateManager = this.AppendModule(NewGateManager()).(*GateManager)
-	//this.gsManager = this.AppendModule(NewGSManager()).(*GSManager)
-	//this.fightManager = this.AppendModule(fight.NewFightManager()).(*fight.FightManager)
-	//TODO
+	this.gateManager = this.AppendModule(NewGateManager()).(*GateManager)
+	this.clientManager = this.AppendModule(NewClientManager()).(*ClientManager)
+	this.gameManager = this.AppendModule(NewGameManager()).(*GameManager)
+	this.userManager = this.AppendModule(NewUserManager()).(*UserManager)
 	return this.DefaultModuleManager.Init()
 }
