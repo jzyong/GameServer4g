@@ -14,7 +14,7 @@ func NewGateManager() *GateManager {
 	return &GateManager{}
 }
 
-//@
+//
 func (this *GateManager) Init() error {
 	log.Info("GateManager:init")
 	//TODO zookeeper 初始化

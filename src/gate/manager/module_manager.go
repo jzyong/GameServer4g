@@ -6,10 +6,10 @@ import (
 
 type ModuleManager struct {
 	*util.DefaultModuleManager
-	clientManager *ClientManager
-	gateManager   *GateManager
-	gameManager   *GameManager
-	userManager   *UserManager
+	ClientManager *ClientManager
+	GateManager   *GateManager
+	GameManager   *GameManager
+	UserManager   *UserManager
 }
 
 var Module = &ModuleManager{
@@ -17,9 +17,9 @@ var Module = &ModuleManager{
 }
 
 func (this *ModuleManager) Init() error {
-	this.gateManager = this.AppendModule(NewGateManager()).(*GateManager)
-	this.clientManager = this.AppendModule(NewClientManager()).(*ClientManager)
-	this.gameManager = this.AppendModule(NewGameManager()).(*GameManager)
-	this.userManager = this.AppendModule(NewUserManager()).(*UserManager)
+	this.GateManager = this.AppendModule(NewGateManager()).(*GateManager)
+	this.ClientManager = this.AppendModule(NewClientManager()).(*ClientManager)
+	this.GameManager = this.AppendModule(NewGameManager()).(*GameManager)
+	this.UserManager = this.AppendModule(NewUserManager()).(*UserManager)
 	return this.DefaultModuleManager.Init()
 }

@@ -1,5 +1,6 @@
 {
-  "Id": 1,
+  "id": 1,
+  "clientUrl": "127.0.0.1:6060",
   "UserConnectCount": 2000,
   "LogFileName": "",
   "LogLevel": "debug",

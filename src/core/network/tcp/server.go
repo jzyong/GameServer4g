@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	"net"
+	"reflect"
+	"runtime"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -24,13 +28,13 @@ type Server interface {
 	//得到链接管理
 	GetChannelManager() ChannelManager
 	//设置该Server的连接创建时Hook函数
-	SetOnConnStart(func(Channel))
+	SetChannelActive(func(Channel))
 	//设置该Server的连接断开时的Hook函数
-	SetOnConnStop(func(Channel))
+	SetChannelInactive(func(Channel))
 	//调用连接OnConnStart Hook函数
-	OnConnStart(conn Channel)
+	ChannelActive(conn Channel)
 	//调用连接OnConnStop Hook函数
-	OnConnStop(conn Channel)
+	ChannelInactive(conn Channel)
 	//服务器类型 0客户端，1内部服务器
 	GetServerType() int32
 }
@@ -50,16 +54,39 @@ type serverImpl struct {
 	//当前Server的链接管理器
 	ChannelManager ChannelManager
 	//该Server的连接创建时Hook函数
-	ConnStart func(conn Channel)
+	channelActive func(conn Channel)
 	//该Server的连接断开时的Hook函数
-	ConnStop func(conn Channel)
+	channelInactive func(conn Channel)
 	///服务器类型
 	ServerType int32
 }
 
-//============== 实现 _interface.IServer 里的全部接口方法 ========
+//创建网络服务
+func NewServer(name, url string, serverType int32) (Server, error) {
+	ipPorts := strings.Split(url, ":")
+	if len(ipPorts) < 2 {
+		return nil, fmt.Errorf("url format error")
+	}
+	port, err := strconv.ParseInt(ipPorts[1], 10, 32)
+	if err != nil {
+		return nil, err
+	}
 
-//开启网络服务
+	return &serverImpl{
+		Name:              name,
+		IPVersion:         "tcp4", //暂时都是tcp4
+		IP:                ipPorts[0],
+		Port:              int32(port),
+		MessageDistribute: NewMessageDistribute(uint32(runtime.NumCPU())),
+		ChannelManager:    NewChannelManager(),
+		ServerType:        serverType,
+	}, nil
+
+}
+
+//============== 实现 Server 里的全部接口方法 ========
+
+//开启网络服务 用go启动
 func (s *serverImpl) Start() {
 	log.Infof("[START] Server name: %s,listener at IP: %s, Port %d is starting\n", s.Name, s.IP, s.Port)
 
@@ -114,6 +141,8 @@ func (s *serverImpl) Start() {
 			go channel.Start()
 		}
 	}()
+	//阻塞,否则主Go退出， listenner的go将会退出
+	select {}
 }
 
 func (s *serverImpl) NewChannel(conn *net.TCPConn, cid uint32) Channel {
@@ -137,6 +166,7 @@ func (s *serverImpl) Run() {
 
 //路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
 func (s *serverImpl) RegisterHandler(msgId int32, handler TcpHandler) {
+	log.Infof("%d 注册handler %s", handler, reflect.TypeOf(handler).Elem().Name())
 	s.MessageDistribute.RegisterHandler(msgId, handler)
 }
 
@@ -146,28 +176,28 @@ func (s *serverImpl) GetChannelManager() ChannelManager {
 }
 
 //设置该Server的连接创建时Hook函数
-func (s *serverImpl) SetOnConnStart(hookFunc func(Channel)) {
-	s.ConnStart = hookFunc
+func (s *serverImpl) SetChannelActive(hookFunc func(Channel)) {
+	s.channelActive = hookFunc
 }
 
 //设置该Server的连接断开时的Hook函数
-func (s *serverImpl) SetOnConnStop(hookFunc func(Channel)) {
-	s.ConnStop = hookFunc
+func (s *serverImpl) SetChannelInactive(hookFunc func(Channel)) {
+	s.channelInactive = hookFunc
 }
 
 //调用连接OnConnStart Hook函数
-func (s *serverImpl) OnConnStart(conn Channel) {
-	if s.ConnStart != nil {
+func (s *serverImpl) ChannelActive(conn Channel) {
+	if s.ChannelActive != nil {
 		//fmt.Println("---> CallOnConnStart....")
-		s.OnConnStart(conn)
+		s.ChannelActive(conn)
 	}
 }
 
 //调用连接OnConnStop Hook函数
-func (s *serverImpl) OnConnStop(conn Channel) {
-	if s.ConnStop != nil {
+func (s *serverImpl) ChannelInactive(conn Channel) {
+	if s.ChannelInactive != nil {
 		//fmt.Println("---> CallOnConnStop....")
-		s.OnConnStop(conn)
+		s.ChannelInactive(conn)
 	}
 }
 

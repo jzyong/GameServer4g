@@ -19,6 +19,6 @@ type BaseTcpHandler struct{}
 //这里之所以BaseRouter的方法都为空，
 // 是因为有的Router不希望有PreHandle或PostHandle
 // 所以Router全部继承BaseRouter的好处是，不需要实现PreHandle和PostHandle也可以实例化
-func (br *BaseTcpHandler) PreRun(message TcpMessage)  {}
-func (br *BaseTcpHandler) Run(message TcpMessage)     {}
-func (br *BaseTcpHandler) PostRun(message TcpMessage) {}
+func (this *BaseTcpHandler) PreRun(message TcpMessage)  {}
+func (this *BaseTcpHandler) Run(message TcpMessage)     {}
+func (this *BaseTcpHandler) PostRun(message TcpMessage) {}
