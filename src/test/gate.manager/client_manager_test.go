@@ -82,7 +82,7 @@ func ClientTest(i int32) {
 	}
 }
 
-func TestConnectServer(t *testing.T) {
+func TestConnectClientServer(t *testing.T) {
 
 	//	客户端测试
 	go ClientTest(1)

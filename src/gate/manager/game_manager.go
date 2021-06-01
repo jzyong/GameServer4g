@@ -9,7 +9,7 @@ import (
 	"github.com/jzyong/go-mmo-server/src/message"
 )
 
-//后端游戏管理
+//后端游戏网络管理
 type GameManager struct {
 	util.DefaultModule
 	server network.Server

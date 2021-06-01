@@ -12,7 +12,7 @@ Navmesh寻路 [服务器](https://github.com/jzyong/game-server/tree/master/game
 ### TODO
 * 添加zookeeper注册服务发现
 * Influxdb
-* 客户端通信测试
+* 后端服务器链接处理
 
 
 

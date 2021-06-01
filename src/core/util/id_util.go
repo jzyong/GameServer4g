@@ -48,6 +48,12 @@ type Snowflake struct {
 	machId        int16
 }
 
+func NewSnowflake(id int16) *Snowflake {
+	sf := &Snowflake{}
+	sf.Init(id)
+	return sf
+}
+
 func (s *Snowflake) Init(id int16) error {
 	if id > 0xff {
 		return errors.New("illegal machine id")
@@ -75,4 +81,4 @@ func (s *Snowflake) GetId() (int64, error) {
 	return int64((0x1ffffffffff&s.lastTimestamp)<<22) + int64(0xff<<10) + int64(0xfff&s.index), nil
 }
 
-var UUID Snowflake
+var UUID *Snowflake

@@ -9,11 +9,10 @@ import (
 	"github.com/jzyong/go-mmo-server/src/message"
 )
 
-//客户端连接管理
+//客户端网络连接管理
 type ClientManager struct {
 	util.DefaultModule
 	server network.Server
-	//TODO 添加网络模块
 }
 
 func NewClientManager() *ClientManager {
@@ -49,12 +48,30 @@ func (this *ClientManager) GetServer() network.Server {
 
 //链接激活
 func clientChannelActive(channel network.Channel) {
-	//TODO 创建用户，加入。。。
+	// 创建用户，加入。。。
+	id, _ := util.UUID.GetId()
+	user := NewUser(id, channel)
+	channel.SetProperty("user", user)
+	GetUserManager().AddSessionUser(user)
+	log.Infof("用户连接创建：%v 会话：%d 总人数：%d", channel.RemoteAddr(), id, GetUserManager().GetUserCount())
 }
 
 //链接断开
 func clientChannelInactive(channel network.Channel) {
-	//TODO 移除用户，。。。
+	//移除用户，。。。
+	u, err := channel.GetProperty("user")
+	if err == nil {
+		user := u.(*User)
+		if user != nil {
+			//log.Debug("用户退出 sessionId：", user.SessionId, " Id:", user.Id, " ip:", channel.RemoteAddr())
+			GetUserManager().UserOffLine(channel, ClientClose)
+		} else {
+			log.Errorf("sessionId：%v用户不存在", channel.RemoteAddr())
+		}
+
+	} else {
+		log.Warn("用户退出 ip:", channel.RemoteAddr(), " 无用户信息")
+	}
 }
 
 func (this *ClientManager) registerHandlers() {
