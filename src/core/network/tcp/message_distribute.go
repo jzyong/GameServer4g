@@ -2,7 +2,6 @@ package network
 
 import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
-	"reflect"
 	"strconv"
 )
 
@@ -13,7 +12,7 @@ type MessageDistribute interface {
 	//处理消息
 	RunHandler(message TcpMessage)
 	//为消息添加具体的处理逻辑
-	RegisterHandler(msgId int32, handler TcpHandler)
+	RegisterHandler(msgId int32, handler *TcpHandler)
 	//启动worker工作池
 	StartWorkerPool()
 	//将消息交给TaskQueue,由worker进行处理
@@ -22,14 +21,14 @@ type MessageDistribute interface {
 
 //Handler 处理器
 type messageDistributeImpl struct {
-	handlers       map[int32]TcpHandler //存放每个MsgId 所对应的处理方法的map属性
-	WorkerPoolSize uint32               //业务工作Worker池的数量
-	TaskQueue      []chan TcpMessage    //Worker负责取任务的消息队列
+	handlers       map[int32]*TcpHandler //存放每个MsgId 所对应的处理方法的map属性
+	WorkerPoolSize uint32                //业务工作Worker池的数量
+	TaskQueue      []chan TcpMessage     //Worker负责取任务的消息队列
 }
 
 func NewMessageDistribute(workPoolSize uint32) MessageDistribute {
 	return &messageDistributeImpl{
-		handlers:       make(map[int32]TcpHandler),
+		handlers:       make(map[int32]*TcpHandler),
 		WorkerPoolSize: workPoolSize,
 		//一个worker对应一个queue
 		TaskQueue: make([]chan TcpMessage, workPoolSize),
@@ -56,20 +55,18 @@ func (mh *messageDistributeImpl) RunHandler(msg TcpMessage) {
 		return
 	}
 	//执行对应处理方法
-	handler.PreRun(msg)
-	handler.Run(msg)
-	handler.PostRun(msg)
+	handler.run(msg)
 }
 
 //为消息添加具体的处理逻辑
-func (mh *messageDistributeImpl) RegisterHandler(msgId int32, handler TcpHandler) {
+func (mh *messageDistributeImpl) RegisterHandler(msgId int32, handler *TcpHandler) {
 	//1 判断当前msg绑定的API处理方法是否已经存在
 	if _, ok := mh.handlers[msgId]; ok {
 		panic("repeated api , msgId = " + strconv.Itoa(int(msgId)))
 	}
 	//2 添加msg与handler的绑定关系
 	mh.handlers[msgId] = handler
-	log.Infof("Add handler %d = %s", msgId, reflect.TypeOf(handler).Elem().Name())
+	log.Infof("Add handler %d ", msgId)
 }
 
 //启动一个Worker工作流程

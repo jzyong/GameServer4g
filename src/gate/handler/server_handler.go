@@ -7,11 +7,8 @@ import (
 	"github.com/jzyong/go-mmo-server/src/message"
 )
 
-type HelloHandler struct {
-	network.BaseTcpHandler
-}
-
-func (br *HelloHandler) Run(msg network.TcpMessage) {
+//获取服务器列表
+func HandleServerList(msg network.TcpMessage) bool {
 	request := &message.ServerListRequest{}
 	proto.Unmarshal(msg.GetData(), request)
 	log.Infof("请求%d", request.GetType())
@@ -29,5 +26,5 @@ func (br *HelloHandler) Run(msg network.TcpMessage) {
 	}
 
 	network.SendClientProtoMsg(msg.GetChannel(), int32(message.MID_ServerListRes), response)
-
+	return true
 }

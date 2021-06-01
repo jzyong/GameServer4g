@@ -58,7 +58,7 @@ func ChannelInactive(channel network.Channel) {
 }
 
 func (this *ClientManager) registerHandlers() {
-	this.server.RegisterHandler(int32(message.MID_ServerListReq), &handler.HelloHandler{})
+	this.server.RegisterHandler(int32(message.MID_ServerListReq), handler.HandleServerList)
 }
 
 func (this *ClientManager) Stop() {

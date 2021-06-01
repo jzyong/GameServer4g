@@ -23,7 +23,7 @@ type Server interface {
 	//开启业务服务方法
 	Run()
 	//路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
-	RegisterHandler(msgId int32, handler TcpHandler)
+	RegisterHandler(msgId int32, handler HandlerMethod)
 	//得到链接管理
 	GetChannelManager() ChannelManager
 	//设置该Server的连接创建时Hook函数
@@ -164,8 +164,8 @@ func (s *serverImpl) Run() {
 }
 
 //路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
-func (s *serverImpl) RegisterHandler(msgId int32, handler TcpHandler) {
-	s.MessageDistribute.RegisterHandler(msgId, handler)
+func (s *serverImpl) RegisterHandler(msgId int32, handler HandlerMethod) {
+	s.MessageDistribute.RegisterHandler(msgId, NewTcpHandler(handler))
 }
 
 //得到链接管理
