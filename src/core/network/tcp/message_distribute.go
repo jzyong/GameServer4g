@@ -2,6 +2,7 @@ package network
 
 import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
+	"reflect"
 	"strconv"
 )
 
@@ -68,7 +69,7 @@ func (mh *messageDistributeImpl) RegisterHandler(msgId int32, handler TcpHandler
 	}
 	//2 添加msg与handler的绑定关系
 	mh.handlers[msgId] = handler
-	log.Debug("Add handler msgId = ", msgId)
+	log.Infof("Add handler %d = %s", msgId, reflect.TypeOf(handler).Elem().Name())
 }
 
 //启动一个Worker工作流程

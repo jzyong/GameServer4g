@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	"net"
-	"reflect"
 	"runtime"
 	"strconv"
 	"strings"
@@ -166,7 +165,6 @@ func (s *serverImpl) Run() {
 
 //路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
 func (s *serverImpl) RegisterHandler(msgId int32, handler TcpHandler) {
-	log.Infof("%d 注册handler %s", handler, reflect.TypeOf(handler).Elem().Name())
 	s.MessageDistribute.RegisterHandler(msgId, handler)
 }
 
@@ -187,17 +185,17 @@ func (s *serverImpl) SetChannelInactive(hookFunc func(Channel)) {
 
 //调用连接OnConnStart Hook函数
 func (s *serverImpl) ChannelActive(conn Channel) {
-	if s.ChannelActive != nil {
+	if s.channelActive != nil {
 		//fmt.Println("---> CallOnConnStart....")
-		s.ChannelActive(conn)
+		s.channelActive(conn)
 	}
 }
 
 //调用连接OnConnStop Hook函数
 func (s *serverImpl) ChannelInactive(conn Channel) {
-	if s.ChannelInactive != nil {
+	if s.channelInactive != nil {
 		//fmt.Println("---> CallOnConnStop....")
-		s.ChannelInactive(conn)
+		s.channelInactive(conn)
 	}
 }
 

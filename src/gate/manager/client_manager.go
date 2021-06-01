@@ -5,6 +5,8 @@ import (
 	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
 	"github.com/jzyong/go-mmo-server/src/core/util"
 	"github.com/jzyong/go-mmo-server/src/gate/config"
+	"github.com/jzyong/go-mmo-server/src/gate/handler"
+	"github.com/jzyong/go-mmo-server/src/message"
 )
 
 //客户端连接管理
@@ -22,33 +24,19 @@ func GetClientManager() *ClientManager {
 	return Module.ClientManager
 }
 
-//@
 func (this *ClientManager) Init() error {
 	log.Info("ClientManager:init")
 
+	//启动网络
 	server, err := network.NewServer("client", config.GateConfigInstance.ClientUrl, network.ClientServer)
 	if err != nil {
 		return err
 	}
 	this.server = server
-
 	this.server.SetChannelActive(ChannelActive)
 	this.server.SetChannelInactive(ChannelInactive)
-
+	this.registerHandlers()
 	go this.server.Start()
-
-	//TODO 添加网络模块
-	//context := &nw.Context{
-	//	SessionCreator: func(conn nw.Conn) nw.Session { return NewClientSession(conn) },
-	//	Splitter:       pb.Split,
-	//	ChanSize:       200,
-	//}
-	//server := wsserver.NewServer(context)
-	//err := server.Start(conf.GetPort())
-	//if err != nil {
-	//	return err
-	//}
-	//this.server = server
 
 	log.Info("ClientManager:inited")
 	return nil
@@ -67,6 +55,10 @@ func ChannelActive(channel network.Channel) {
 //链接断开
 func ChannelInactive(channel network.Channel) {
 	//TODO 移除用户，。。。
+}
+
+func (this *ClientManager) registerHandlers() {
+	this.server.RegisterHandler(int32(message.MID_ServerListReq), &handler.HelloHandler{})
 }
 
 func (this *ClientManager) Stop() {

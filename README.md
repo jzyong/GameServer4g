@@ -9,4 +9,11 @@ Navmesh寻路 [服务器](https://github.com/jzyong/game-server/tree/master/game
 * QQ交流群：143469012
 
 
+### TODO
+* 添加zookeeper注册服务发现
+* Influxdb
+* 客户端通信测试
+
+
+
 
