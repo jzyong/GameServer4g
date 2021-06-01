@@ -33,8 +33,8 @@ func (this *ClientManager) Init() error {
 		return err
 	}
 	this.server = server
-	this.server.SetChannelActive(ChannelActive)
-	this.server.SetChannelInactive(ChannelInactive)
+	this.server.SetChannelActive(clientChannelActive)
+	this.server.SetChannelInactive(clientChannelInactive)
 	this.registerHandlers()
 	go this.server.Start()
 
@@ -48,12 +48,12 @@ func (this *ClientManager) GetServer() network.Server {
 }
 
 //链接激活
-func ChannelActive(channel network.Channel) {
+func clientChannelActive(channel network.Channel) {
 	//TODO 创建用户，加入。。。
 }
 
 //链接断开
-func ChannelInactive(channel network.Channel) {
+func clientChannelInactive(channel network.Channel) {
 	//TODO 移除用户，。。。
 }
 

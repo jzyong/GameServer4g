@@ -19,6 +19,8 @@ type GateConfig struct {
 	Id int32 `json:"id"`
 	//客户端链接地址
 	ClientUrl string `json:"clientUrl"`
+	//后端游戏服务器地址
+	GameUrl string `json:"gameUrl"`
 
 	//允许用户连接数
 	UserConnectCount int32 `json:"userConnectCount"`
@@ -34,6 +36,7 @@ func init() {
 	GateConfigInstance = &GateConfig{
 		Id:               2,
 		ClientUrl:        "127.0.0.1:6060",
+		GameUrl:          "127.0.0.1:6061",
 		LogLevel:         "debug",
 		UserConnectCount: 10000,
 		ClusterRpcURL:    "192.168.110.16:2002",

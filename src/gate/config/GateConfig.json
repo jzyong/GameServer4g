@@ -1,6 +1,7 @@
 {
   "id": 1,
   "clientUrl": "0.0.0.0:6060",
+  "gameUrl": "0.0.0.0:6061",
   "UserConnectCount": 2000,
   "LogFileName": "",
   "LogLevel": "debug",

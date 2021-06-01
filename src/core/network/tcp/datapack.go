@@ -101,19 +101,19 @@ func (dp *InnerDataPack) Pack(msg TcpMessage) ([]byte, error) {
 	dataBuff := bytes.NewBuffer([]byte{})
 
 	//写dataLen 不包含自身长度
-	if err := binary.Write(dataBuff, binary.BigEndian, msg.GetDataLen()+dp.GetHeadLen()); err != nil {
+	if err := binary.Write(dataBuff, binary.LittleEndian, msg.GetDataLen()+dp.GetHeadLen()); err != nil {
 		return nil, err
 	}
 	//写msgID
-	if err := binary.Write(dataBuff, binary.BigEndian, msg.GetMsgId()); err != nil {
+	if err := binary.Write(dataBuff, binary.LittleEndian, msg.GetMsgId()); err != nil {
 		return nil, err
 	}
 	//发送者id
-	if err := binary.Write(dataBuff, binary.BigEndian, msg.GetObjectId()); err != nil {
+	if err := binary.Write(dataBuff, binary.LittleEndian, msg.GetObjectId()); err != nil {
 		return nil, err
 	}
 	//会话id
-	if err := binary.Write(dataBuff, binary.BigEndian, msg.GetSessionId()); err != nil {
+	if err := binary.Write(dataBuff, binary.LittleEndian, msg.GetSessionId()); err != nil {
 		return nil, err
 	}
 	//写data数据
@@ -131,15 +131,15 @@ func (dp *InnerDataPack) Unpack(binaryData []byte, msgLength uint32) (TcpMessage
 	msg := &InnerMessage{}
 
 	//读msgID
-	if err := binary.Read(dataBuff, binary.BigEndian, &msg.Id); err != nil {
+	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.Id); err != nil {
 		return nil, err
 	}
 	//发送者id
-	if err := binary.Read(dataBuff, binary.BigEndian, &msg.SenderId); err != nil {
+	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.SenderId); err != nil {
 		return nil, err
 	}
 	//会话id
-	if err := binary.Read(dataBuff, binary.BigEndian, &msg.SessionId); err != nil {
+	if err := binary.Read(dataBuff, binary.LittleEndian, &msg.SessionId); err != nil {
 		return nil, err
 	}
 	//读取数据
