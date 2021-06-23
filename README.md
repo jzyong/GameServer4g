@@ -10,9 +10,11 @@ Navmesh寻路 [服务器](https://github.com/jzyong/game-server/tree/master/game
 
 
 ### TODO
-* 添加zookeeper注册服务发现
+* 添加zookeeper服务发现，事件监听
 * Influxdb
 * 后端服务器链接处理
+* grpc请求，移除register 注册中心rpc
+* protobuf
 
 
 

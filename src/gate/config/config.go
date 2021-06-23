@@ -30,6 +30,10 @@ type GateConfig struct {
 	LogFileName string
 	//gate rpc地址
 	ClusterRpcURL string
+	//zookeeper 地址
+	ZookeeperUrls []string `json:"zookeeperUrls"`
+	//自定义配置
+	Profile string `json:"profile"`
 }
 
 func init() {

@@ -118,7 +118,7 @@ func (c *channelImpl) StartWriter() {
 //	读消息Goroutine，用于从客户端中读取数据
 func (c *channelImpl) StartReader() {
 	//fmt.Println("[Reader Goroutine is running]")
-	defer fmt.Println(c.RemoteAddr().String(), "[conn Reader exit!]")
+	defer log.Infof("%s conn Reader exit!", c.RemoteAddr().String())
 	defer c.Stop()
 
 	for {
@@ -176,7 +176,7 @@ func (c *channelImpl) Start() {
 
 //停止连接，结束当前连接状态M
 func (c *channelImpl) Stop() {
-	fmt.Println("Conn Stop()...ConnID = ", c.ConnID)
+	log.Infof("Conn Stop()...ConnID = %d", c.ConnID)
 	//如果当前链接已经关闭
 	if c.IsClosed == true {
 		return
