@@ -2,7 +2,7 @@ syntax = "proto3";
 package ProtoMessage;
 option java_package = "org.mmo.message";
 //option go_package="github.com/jzy/go-game-server/protobuf";
-option go_package = "message";
+option go_package = "src/message";
 
 
 message String {

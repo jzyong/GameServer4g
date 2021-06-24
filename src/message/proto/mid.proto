@@ -1,7 +1,7 @@
 syntax = "proto3";
 package ProtoMessage;
 option java_package = "org.mmo.message";
-option go_package = "message";
+option go_package = "src/message";
 
 //消息ID枚举
 // 客户端请求消息XXRequest，服务器返回消息XXResponse
@@ -16,15 +16,11 @@ option go_package = "message";
 
 
 enum MID {
-    None = 0;
+  None = 0;
 
-    //服务器内部消息
-
-    // 服务器注册更新
-    ServerRegisterUpdateReq = 110001;
-    // 服务器间请求游戏服务器列表
-    ServerListReq = 110003;
-    // 服务器间响应游戏服务器列表
-    ServerListRes = 110004;
+  //服务器内部消息
+  ServerRegisterUpdateReq = 110001; //服务器注册更新
+  ServerListReq = 110003; //服务器间请求游戏服务器列表
+  ServerListRes = 110004; //服务器间响应游戏服务器列表
 
 }
