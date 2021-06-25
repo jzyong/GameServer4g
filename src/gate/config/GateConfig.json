@@ -7,7 +7,7 @@
   "LogLevel": "debug",
   "ClusterRpcURL": "localhost:1234",
   "zookeeperUrls": [
-    "127.0.0.1:2181"
+    "192.168.110.2:2181"
   ],
   "profile": "jzy"
 }
