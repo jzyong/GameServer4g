@@ -40,7 +40,6 @@ func (this *GateManager) Init() error {
 	}
 	go watchZkEvent(event)
 	time.Sleep(time.Second * 5)
-	util.ZKUpdate(this.ZKConnect, fmt.Sprintf(util.GateConfig, config.Profile, config.Id), string(configBytes))
 
 	//注册服务
 	util.ZKAdd(this.ZKConnect, fmt.Sprintf(util.GateGameService, config.Profile, config.Id), config.GameUrl, zk.FlagEphemeral)

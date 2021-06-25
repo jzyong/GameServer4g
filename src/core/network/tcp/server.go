@@ -38,7 +38,7 @@ type Server interface {
 	GetServerType() int32
 }
 
-//iServer 接口实现，定义一个Server服务类
+//Server 接口实现，定义一个Server服务类
 type serverImpl struct {
 	//服务器的名称
 	Name string
@@ -111,7 +111,7 @@ func (s *serverImpl) Start() {
 		//已经监听成功
 		log.Info("start server  ", s.Name, " success, now listening...")
 
-		//TODO server.go 应该有一个自动生成ID的方法
+		// server.go 应该有一个自动生成ID的方法
 		var cid uint32
 		cid = 0
 
