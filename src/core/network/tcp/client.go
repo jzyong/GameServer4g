@@ -41,7 +41,7 @@ type clientImpl struct {
 	ServerUrl string
 	//当前Server的消息管理模块，用来绑定MsgId和对应的处理方法
 	MessageDistribute MessageDistribute
-	//当前Server的链接管理器
+	//当前的链接管理器
 	Channel Channel
 	//该Client的连接创建时Hook函数
 	channelActive func(conn Channel)
@@ -81,6 +81,7 @@ func (s *clientImpl) Start() {
 		log.Info("client ", s.Name, " success, now connecting...")
 		s.Conn = conn
 		channel := NewClientChannel(conn, s.MessageDistribute, s)
+		s.Channel = channel
 
 		//3 启动当前链接的处理业务
 		go channel.Start()

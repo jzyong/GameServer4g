@@ -6,7 +6,8 @@ import (
 
 type ModuleManager struct {
 	*util.DefaultModuleManager
-	HallManager *HallManager
+	HallManager   *HallManager
+	ClientManager *ClientManager
 }
 
 var Module = &ModuleManager{
@@ -15,5 +16,6 @@ var Module = &ModuleManager{
 
 func (this *ModuleManager) Init() error {
 	this.HallManager = this.AppendModule(NewHallManager()).(*HallManager)
+	this.ClientManager = this.AppendModule(NewClientManager()).(*ClientManager)
 	return this.DefaultModuleManager.Init()
 }
