@@ -9,7 +9,6 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/util"
 	"github.com/jzyong/go-mmo-server/src/gate/handler"
 	"github.com/jzyong/go-mmo-server/src/message"
-	"time"
 )
 
 //管理连接网关的tcp客户端
@@ -29,24 +28,24 @@ func GetClientManager() *ClientManager {
 func (this *ClientManager) Init() error {
 	log.Info("ClientManager:init")
 
-	//启动网络
-	//TODO 从zookeeper中获取gate连接
-	client, err := network.NewClient("GateClient", "192.168.110.2:6061")
-	if err != nil {
-		return err
-	}
-	this.gateClient = client
-	this.gateClient.SetChannelActive(clientChannelActive)
-	this.gateClient.SetChannelInactive(clientChannelInactive)
-	this.registerHandlers()
-	go this.gateClient.Start()
-
-	//TODO 测试发送消息 待测试接收消息处理
-	time.Sleep(time.Second * 3)
-	msg := message.UserLoginResponse{
-		PlayerId: 1,
-	}
-	SendMsg(this.gateClient.GetChannel(), int32(message.MID_ServerListRes), 1, &msg)
+	////启动网络
+	////TODO 从zookeeper中获取gate连接
+	//client, err := network.NewClient("GateClient", "192.168.110.2:6061")
+	//if err != nil {
+	//	return err
+	//}
+	//this.gateClient = client
+	//this.gateClient.SetChannelActive(clientChannelActive)
+	//this.gateClient.SetChannelInactive(clientChannelInactive)
+	//this.registerHandlers()
+	//go this.gateClient.Start()
+	//
+	////TODO 测试发送消息 待测试接收消息处理
+	//time.Sleep(time.Second * 3)
+	//msg := message.UserLoginResponse{
+	//	PlayerId: 1,
+	//}
+	//SendMsg(this.gateClient.GetChannel(), int32(message.MID_ServerListRes), 1, &msg)
 
 	log.Info("ClientManager:inited")
 	return nil

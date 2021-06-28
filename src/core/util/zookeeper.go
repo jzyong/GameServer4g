@@ -8,14 +8,17 @@ import (
 	"time"
 )
 
-const GateGameService string = "/mmo/%s/service/GateGameTcp/%d"     //gate game tcp服务
-const GateClientService string = "/mmo/%s/service/GateClientTcp/%d" //gate client tcp服务
-const HallRpcService string = "/mmo/%s/service/HallRpc/%d"          //hall rpc服务
-const HallConfig string = "/mmo/%s/hall%d"                          //hall 配置
-const GateConfig string = "/mmo/%s/gate%d"                          //gate 配置
+const GateGameService string = "/mmo/%s/service/GateGameTcp/%d"        //gate game tcp服务
+const GateGameServiceListenPath string = "/mmo/%s/service/GateGameTcp" //网关服务监听路径
+const GateClientService string = "/mmo/%s/service/GateClientTcp/%d"    //gate client tcp服务
+const HallRpcService string = "/mmo/%s/service/HallRpc/%d"             //hall rpc服务
+const HallConfig string = "/mmo/%s/hall%d"                             //hall 配置
+const GateConfig string = "/mmo/%s/gate%d"                             //gate 配置
 
 //参考：https://www.cnblogs.com/zhichaoma/p/12640064.html
 // https://blog.csdn.net/bingfeilongxin/article/details/88578887
+// https://www.cnblogs.com/qiniu/p/10735183.html
+// zookeeper go语言的监听不完善，如果不考虑java程序，选择etcd
 
 //创建zookeeper连接
 func ZKCreateConnect(hosts []string) *zk.Conn {
@@ -118,4 +121,28 @@ func ZKDelete(conn *zk.Conn, path string) {
 		return
 	}
 	log.Infof("路径%s 删除", path)
+}
+
+//事件监听 只能监听一层子目录？
+func ZKWatchChildrenW(conn *zk.Conn, path string) (chan []string, chan error) {
+	children := make(chan []string)
+	errors := make(chan error)
+
+	go func() {
+		for {
+			c, _, events, err := conn.ChildrenW(path)
+			if err != nil {
+				errors <- err
+				return
+			}
+			children <- c
+			e := <-events
+			if e.Err != nil {
+				errors <- e.Err
+				return
+			}
+			log.Debugf("路径：%v 发生改变：%v", path, e)
+		}
+	}()
+	return children, errors
 }
