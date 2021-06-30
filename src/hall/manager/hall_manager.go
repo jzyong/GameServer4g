@@ -43,12 +43,14 @@ func (this *HallManager) Init() error {
 
 //监听网关服务
 func (this *HallManager) watchGateService() {
-	children, errors := util.ZKWatchChildrenW(this.ZKConnect, fmt.Sprintf(util.GateGameServiceListenPath, config.HallConfigInstance.Profile))
+	path := fmt.Sprintf(util.GateGameServiceListenPath, config.HallConfigInstance.Profile)
+	children, errors := util.ZKWatchChildrenW(this.ZKConnect, path)
 	go func() {
 		for {
 			select {
 			case gateIds := <-children:
 				log.Infof("网关列表变更为：%v", gateIds)
+				GetClientManager().UpdateGateClient(gateIds, this.ZKConnect, path)
 			case err := <-errors:
 				log.Warnf("网关服务监听异常：%v", err)
 			}

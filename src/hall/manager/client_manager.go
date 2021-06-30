@@ -3,22 +3,26 @@ package manager
 import (
 	"errors"
 	"fmt"
+	"github.com/go-zookeeper/zk"
 	"github.com/golang/protobuf/proto"
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
 	"github.com/jzyong/go-mmo-server/src/core/util"
-	"github.com/jzyong/go-mmo-server/src/gate/handler"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"strconv"
+	"sync"
 )
 
 //管理连接网关的tcp客户端
 type ClientManager struct {
 	util.DefaultModule
-	gateClient network.Client //网关客户端 TODO 修改为列表
+	gateClients     map[int32]*GateClient // 网关连接
+	gateClientsLock sync.RWMutex          //网关读写锁
 }
 
 func NewClientManager() *ClientManager {
-	return &ClientManager{}
+	return &ClientManager{
+		gateClients: make(map[int32]*GateClient),
+	}
 }
 
 func GetClientManager() *ClientManager {
@@ -81,8 +85,68 @@ func clientChannelInactive(channel network.Channel) {
 	//}
 }
 
+//注册消息
 func (this *ClientManager) registerHandlers() {
-	this.gateClient.RegisterHandler(int32(message.MID_ServerListReq), handler.HandleServerList)
+	//消息处理待优化，不能注册在客户端
+	//TODO
+	//this.gateClient.RegisterHandler(int32(message.MID_ServerListReq), handler.HandleServerList)
+}
+
+//更新网关客户端
+func (this *ClientManager) UpdateGateClient(gateServerIds []string, zkConnect *zk.Conn, path string) {
+	this.gateClientsLock.Lock()
+	defer this.gateClientsLock.Unlock()
+	//遍历添加新连接
+	for _, gateIdStr := range gateServerIds {
+		gateId, err := strconv.ParseInt(gateIdStr, 10, 32)
+		if err != nil {
+			log.Warn("网关id 异常 %v ：%v", gateIdStr, err)
+		}
+		if _, ok := this.gateClients[int32(gateId)]; ok {
+			continue
+		} else {
+			//连接网关
+			serverUrl := util.ZKGet(zkConnect, fmt.Sprintf("%v/%v", path, gateIdStr))
+			var client = &GateClient{
+				GateId:  int32(gateId),
+				GateUrl: serverUrl,
+			}
+			this.gateClients[int32(gateId)] = client
+			log.Infof("新增网关客户端：%v 地址为：%v", gateIdStr, serverUrl)
+			tcpClient, err := network.NewClient(fmt.Sprintf("GateClient-%v", gateIdStr), serverUrl)
+			if err != nil {
+				log.Warn("网关id 异常 %v ：%v", gateIdStr, err)
+				continue
+			}
+			client.Client = tcpClient
+			tcpClient.SetChannelActive(clientChannelActive)
+			tcpClient.SetChannelInactive(clientChannelInactive)
+			go tcpClient.Start()
+		}
+	}
+	//删除已关闭的网关
+	for gateId, _ := range this.gateClients {
+		gateIdStr := strconv.Itoa(int(gateId))
+		if util.SliceContains(gateServerIds, gateIdStr) < 0 {
+			this.gateClients[gateId].Client.Stop()
+			delete(this.gateClients, gateId)
+		}
+	}
+
+}
+
+func (this *ClientManager) Stop() {
+	// 关闭服务器
+	for _, gateClient := range this.gateClients {
+		gateClient.Client.Stop()
+	}
+}
+
+//网关客户端
+type GateClient struct {
+	Client  network.Client //网关客户端
+	GateId  int32          //网关id
+	GateUrl string         //网关连接地址
 }
 
 //发送消息
@@ -105,11 +169,4 @@ func SendMsg(channel network.Channel, msgId int32, senderId int64, message proto
 	//写回客户端
 	channel.GetMsgChan() <- msg
 	return nil
-}
-
-func (this *ClientManager) Stop() {
-	// 关闭服务器
-	if this.gateClient != nil {
-		this.gateClient.Stop()
-	}
 }
