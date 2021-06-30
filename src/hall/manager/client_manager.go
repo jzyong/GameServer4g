@@ -8,6 +8,9 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
 	"github.com/jzyong/go-mmo-server/src/core/util"
+	"github.com/jzyong/go-mmo-server/src/gate/handler"
+	"github.com/jzyong/go-mmo-server/src/message"
+	"runtime"
 	"strconv"
 	"sync"
 )
@@ -15,13 +18,15 @@ import (
 //管理连接网关的tcp客户端
 type ClientManager struct {
 	util.DefaultModule
-	gateClients     map[int32]*GateClient // 网关连接
-	gateClientsLock sync.RWMutex          //网关读写锁
+	gateClients       map[int32]*GateClient     // 网关连接
+	gateClientsLock   sync.RWMutex              //网关读写锁
+	MessageDistribute network.MessageDistribute //消息处理器
 }
 
 func NewClientManager() *ClientManager {
 	return &ClientManager{
-		gateClients: make(map[int32]*GateClient),
+		gateClients:       make(map[int32]*GateClient),
+		MessageDistribute: network.NewMessageDistribute(uint32(runtime.NumCPU())),
 	}
 }
 
@@ -31,6 +36,9 @@ func GetClientManager() *ClientManager {
 
 func (this *ClientManager) Init() error {
 	log.Info("ClientManager:init")
+
+	//开启工作线程池
+	this.MessageDistribute.StartWorkerPool()
 
 	////启动网络
 	////TODO 从zookeeper中获取gate连接
@@ -87,9 +95,8 @@ func clientChannelInactive(channel network.Channel) {
 
 //注册消息
 func (this *ClientManager) registerHandlers() {
-	//消息处理待优化，不能注册在客户端
-	//TODO
-	//this.gateClient.RegisterHandler(int32(message.MID_ServerListReq), handler.HandleServerList)
+	this.MessageDistribute.RegisterHandler(int32(message.MID_ServerListReq), network.NewTcpHandler(handler.HandleServerList))
+
 }
 
 //更新网关客户端
@@ -113,7 +120,7 @@ func (this *ClientManager) UpdateGateClient(gateServerIds []string, zkConnect *z
 			}
 			this.gateClients[int32(gateId)] = client
 			log.Infof("新增网关客户端：%v 地址为：%v", gateIdStr, serverUrl)
-			tcpClient, err := network.NewClient(fmt.Sprintf("GateClient-%v", gateIdStr), serverUrl)
+			tcpClient, err := network.NewClient(fmt.Sprintf("GateClient-%v", gateIdStr), serverUrl, this.MessageDistribute)
 			if err != nil {
 				log.Warn("网关id 异常 %v ：%v", gateIdStr, err)
 				continue

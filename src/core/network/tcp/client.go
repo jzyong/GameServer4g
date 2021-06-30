@@ -7,7 +7,6 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	"io"
 	"net"
-	"runtime"
 	"sync"
 )
 
@@ -19,8 +18,6 @@ type Client interface {
 	Stop()
 	//开启业务服务方法
 	Run()
-	//路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
-	RegisterHandler(msgId int32, handler HandlerMethod)
 	//得到链接
 	GetChannel() Channel
 	//设置该Client的连接创建时Hook函数
@@ -52,11 +49,11 @@ type clientImpl struct {
 }
 
 //创建网络服务
-func NewClient(name, url string) (Client, error) {
+func NewClient(name, url string, messageDistribute MessageDistribute) (Client, error) {
 	return &clientImpl{
 		Name:              name,
 		ServerUrl:         url,
-		MessageDistribute: NewMessageDistribute(uint32(runtime.NumCPU())),
+		MessageDistribute: messageDistribute,
 	}, nil
 }
 
@@ -68,9 +65,6 @@ func (s *clientImpl) Start() {
 
 	//开启一个go去做服务端Linster业务
 	go func() {
-		//0 启动worker工作池机制
-		s.MessageDistribute.StartWorkerPool()
-
 		//1 连接服务器地址
 		conn, err := net.Dial("tcp", s.ServerUrl)
 		if err != nil {
@@ -101,11 +95,6 @@ func (s *clientImpl) Run() {
 	s.Start()
 	//阻塞,否则主Go退出， listener的go将会退出
 	select {}
-}
-
-//路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
-func (s *clientImpl) RegisterHandler(msgId int32, handler HandlerMethod) {
-	s.MessageDistribute.RegisterHandler(msgId, NewTcpHandler(handler))
 }
 
 //得到链接

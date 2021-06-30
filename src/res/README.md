@@ -10,3 +10,8 @@ docker                      |docker运行，镜像制作脚本
 
 
       git fetch origin --prune
+
+2. Github push `OpenSSL SSL_read: Connection was reset, errno 10054`  
+ 
+
+     git config --global http.sslVerify "false"
