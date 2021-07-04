@@ -7,7 +7,7 @@ import (
 	"github.com/jzyong/go-mmo-server/src/message"
 )
 
-//获取服务器列表
+//获取服务器列表 (遗弃)
 func HandleServerList(msg network.TcpMessage) bool {
 	request := &message.ServerListRequest{}
 	proto.Unmarshal(msg.GetData(), request)

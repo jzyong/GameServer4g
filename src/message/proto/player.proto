@@ -15,4 +15,13 @@ message UserLoginResponse {
   int64 playerId = 1; //玩家id
 }
 
+//心跳消息
+message PlayerHeartRequest{
+
+}
+//心跳消息
+message PlayerHeartResponse{
+  int64 timestamp = 1;  //时间戳s
+}
+
 

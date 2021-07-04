@@ -124,6 +124,93 @@ func (x *UserLoginResponse) GetPlayerId() int64 {
 	return 0
 }
 
+//心跳消息
+type PlayerHeartRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+}
+
+func (x *PlayerHeartRequest) Reset() {
+	*x = PlayerHeartRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_player_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PlayerHeartRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlayerHeartRequest) ProtoMessage() {}
+
+func (x *PlayerHeartRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_player_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlayerHeartRequest.ProtoReflect.Descriptor instead.
+func (*PlayerHeartRequest) Descriptor() ([]byte, []int) {
+	return file_player_proto_rawDescGZIP(), []int{2}
+}
+
+//心跳消息
+type PlayerHeartResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Timestamp int64 `protobuf:"varint,1,opt,name=timestamp,proto3" json:"timestamp,omitempty"` //时间戳s
+}
+
+func (x *PlayerHeartResponse) Reset() {
+	*x = PlayerHeartResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_player_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *PlayerHeartResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PlayerHeartResponse) ProtoMessage() {}
+
+func (x *PlayerHeartResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_player_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PlayerHeartResponse.ProtoReflect.Descriptor instead.
+func (*PlayerHeartResponse) Descriptor() ([]byte, []int) {
+	return file_player_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *PlayerHeartResponse) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
 var File_player_proto protoreflect.FileDescriptor
 
 var file_player_proto_rawDesc = []byte{
@@ -136,9 +223,14 @@ var file_player_proto_rawDesc = []byte{
 	0x73, 0x73, 0x77, 0x6f, 0x72, 0x64, 0x22, 0x2f, 0x0a, 0x11, 0x55, 0x73, 0x65, 0x72, 0x4c, 0x6f,
 	0x67, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1a, 0x0a, 0x08, 0x70,
 	0x6c, 0x61, 0x79, 0x65, 0x72, 0x49, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x08, 0x70,
-	0x6c, 0x61, 0x79, 0x65, 0x72, 0x49, 0x64, 0x42, 0x1e, 0x0a, 0x0f, 0x6f, 0x72, 0x67, 0x2e, 0x6d,
-	0x6d, 0x6f, 0x2e, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x5a, 0x0b, 0x73, 0x72, 0x63, 0x2f,
-	0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6c, 0x61, 0x79, 0x65, 0x72, 0x49, 0x64, 0x22, 0x14, 0x0a, 0x12, 0x50, 0x6c, 0x61, 0x79, 0x65,
+	0x72, 0x48, 0x65, 0x61, 0x72, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x33, 0x0a,
+	0x13, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x48, 0x65, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
+	0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
+	0x6d, 0x70, 0x42, 0x1e, 0x0a, 0x0f, 0x6f, 0x72, 0x67, 0x2e, 0x6d, 0x6d, 0x6f, 0x2e, 0x6d, 0x65,
+	0x73, 0x73, 0x61, 0x67, 0x65, 0x5a, 0x0b, 0x73, 0x72, 0x63, 0x2f, 0x6d, 0x65, 0x73, 0x73, 0x61,
+	0x67, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -153,10 +245,12 @@ func file_player_proto_rawDescGZIP() []byte {
 	return file_player_proto_rawDescData
 }
 
-var file_player_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_player_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_player_proto_goTypes = []interface{}{
-	(*UserLoginRequest)(nil),  // 0: ProtoMessage.UserLoginRequest
-	(*UserLoginResponse)(nil), // 1: ProtoMessage.UserLoginResponse
+	(*UserLoginRequest)(nil),    // 0: ProtoMessage.UserLoginRequest
+	(*UserLoginResponse)(nil),   // 1: ProtoMessage.UserLoginResponse
+	(*PlayerHeartRequest)(nil),  // 2: ProtoMessage.PlayerHeartRequest
+	(*PlayerHeartResponse)(nil), // 3: ProtoMessage.PlayerHeartResponse
 }
 var file_player_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -196,6 +290,30 @@ func file_player_proto_init() {
 				return nil
 			}
 		}
+		file_player_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PlayerHeartRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_player_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*PlayerHeartResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -203,7 +321,7 @@ func file_player_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_player_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

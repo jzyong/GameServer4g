@@ -9,6 +9,11 @@ import (
 	"github.com/jzyong/go-mmo-server/src/message"
 )
 
+//注册处理来自客户端的消息
+func (this *ClientManager) registerHandlers() {
+	this.server.RegisterHandler(int32(message.MID_PlayerHeartReq), handler.HandlePlayerHeartReq)
+}
+
 //客户端网络连接管理
 type ClientManager struct {
 	util.DefaultModule
@@ -72,10 +77,6 @@ func clientChannelInactive(channel network.Channel) {
 	} else {
 		log.Warn("用户退出 ip:", channel.RemoteAddr(), " 无用户信息")
 	}
-}
-
-func (this *ClientManager) registerHandlers() {
-	this.server.RegisterHandler(int32(message.MID_ServerListReq), handler.HandleServerList)
 }
 
 func (this *ClientManager) Stop() {

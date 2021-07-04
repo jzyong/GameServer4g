@@ -8,12 +8,19 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
 	"github.com/jzyong/go-mmo-server/src/core/util"
-	"github.com/jzyong/go-mmo-server/src/gate/handler"
+	"github.com/jzyong/go-mmo-server/src/hall/handler"
 	"github.com/jzyong/go-mmo-server/src/message"
 	"runtime"
 	"strconv"
 	"sync"
 )
+
+//注册消息
+func (this *ClientManager) registerHandlers() {
+	//玩家
+	this.MessageDistribute.RegisterHandler(int32(message.MID_UserLoginReq), network.NewTcpHandler(handler.HandUserLogin))
+
+}
 
 //管理连接网关的tcp客户端
 type ClientManager struct {
@@ -40,18 +47,8 @@ func (this *ClientManager) Init() error {
 	//开启工作线程池
 	this.MessageDistribute.StartWorkerPool()
 
-	////启动网络
-	////TODO 从zookeeper中获取gate连接
-	//client, err := network.NewClient("GateClient", "192.168.110.2:6061")
-	//if err != nil {
-	//	return err
-	//}
-	//this.gateClient = client
-	//this.gateClient.SetChannelActive(clientChannelActive)
-	//this.gateClient.SetChannelInactive(clientChannelInactive)
-	//this.registerHandlers()
-	//go this.gateClient.Start()
-	//
+	this.registerHandlers()
+
 	////TODO 测试发送消息 待测试接收消息处理
 	//time.Sleep(time.Second * 3)
 	//msg := message.UserLoginResponse{
@@ -65,38 +62,12 @@ func (this *ClientManager) Init() error {
 
 //链接激活
 func clientChannelActive(channel network.Channel) {
-	//TODO
-	//// 创建用户，加入。。。
-	//id, _ := util.UUID.GetId()
-	//user := NewUser(id, channel)
-	//channel.SetProperty("user", user)
-	//GetUserManager().AddSessionUser(user)
-	//log.Infof("用户连接创建：%v 会话：%d 总人数：%d", channel.RemoteAddr(), id, GetUserManager().GetUserCount())
+	log.Infof("创建网关连接：%v", channel.RemoteAddr())
 }
 
 //链接断开
 func clientChannelInactive(channel network.Channel) {
-	//TODO
-	////移除用户，。。。
-	//u, err := channel.GetProperty("user")
-	//if err == nil {
-	//	user := u.(*User)
-	//	if user != nil {
-	//		//log.Debug("用户退出 sessionId：", user.SessionId, " Id:", user.Id, " ip:", channel.RemoteAddr())
-	//		GetUserManager().UserOffLine(channel, ClientClose)
-	//	} else {
-	//		log.Errorf("sessionId：%v用户不存在", channel.RemoteAddr())
-	//	}
-	//
-	//} else {
-	//	log.Warn("用户退出 ip:", channel.RemoteAddr(), " 无用户信息")
-	//}
-}
-
-//注册消息
-func (this *ClientManager) registerHandlers() {
-	this.MessageDistribute.RegisterHandler(int32(message.MID_ServerListReq), network.NewTcpHandler(handler.HandleServerList))
-
+	log.Infof("网关连接断开：%v", channel.RemoteAddr())
 }
 
 //更新网关客户端
