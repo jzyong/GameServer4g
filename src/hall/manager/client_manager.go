@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/go-zookeeper/zk"
@@ -8,6 +9,10 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
 	"github.com/jzyong/go-mmo-server/src/core/util"
+	"github.com/jzyong/go-mmo-server/src/message"
+	"google.golang.org/grpc"
+	"time"
+
 	//"github.com/jzyong/go-mmo-server/src/hall/handler"
 	//"github.com/jzyong/go-mmo-server/src/message"
 	"runtime"
@@ -25,9 +30,11 @@ import (
 //管理连接网关的tcp客户端
 type ClientManager struct {
 	util.DefaultModule
-	gateClients       map[int32]*GateClient     // 网关连接
-	gateClientsLock   sync.RWMutex              //网关读写锁
-	MessageDistribute network.MessageDistribute //消息处理器
+	gateClients        map[int32]*GateClient     // 网关连接
+	gateClientsLock    sync.RWMutex              //网关读写锁
+	MessageDistribute  network.MessageDistribute //消息处理器
+	WorldClientConnect *grpc.ClientConn
+	PlayerWorldClient  message.PlayerWorldServiceClient
 }
 
 func NewClientManager() *ClientManager {
@@ -110,6 +117,41 @@ func (this *ClientManager) UpdateGateClient(gateServerIds []string, zkConnect *z
 			delete(this.gateClients, gateId)
 		}
 	}
+}
+
+//更新world客户端
+func (this *ClientManager) UpdateWorldClient(serverIds []string, zkConnect *zk.Conn, path string) {
+	//遍历添加新连接
+	for _, IdStr := range serverIds {
+		_, err := strconv.ParseInt(IdStr, 10, 32)
+		if err != nil {
+			log.Warn("world id 异常 %v ：%v", IdStr, err)
+		}
+		//关闭之前
+		if this.WorldClientConnect != nil {
+			this.WorldClientConnect.Close()
+		}
+
+		//启动新连接
+		serverUrl := util.ZKGet(zkConnect, fmt.Sprintf("%v/%v", path, IdStr))
+		conn, err := grpc.Dial(serverUrl, grpc.WithInsecure())
+		if err != nil {
+			log.Warnf("%v", err)
+		}
+		this.WorldClientConnect = conn
+		this.PlayerWorldClient = message.NewPlayerWorldServiceClient(conn)
+
+		//TODO 测试grpc
+		context, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		response, _ := this.PlayerWorldClient.Login(context, &message.UserLoginRequest{
+			Account:  "player1",
+			Password: "123123",
+		})
+		log.Infof("login return %d", response.PlayerId)
+
+		log.Infof("connect to world %s address:%s", path, serverUrl)
+	}
 
 }
 
@@ -117,6 +159,9 @@ func (this *ClientManager) Stop() {
 	// 关闭服务器
 	for _, gateClient := range this.gateClients {
 		gateClient.Client.Stop()
+	}
+	if this.WorldClientConnect != nil {
+		this.WorldClientConnect.Close()
 	}
 }
 

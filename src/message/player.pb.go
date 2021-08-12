@@ -7,6 +7,10 @@
 package message
 
 import (
+	context "context"
+	grpc "google.golang.org/grpc"
+	codes "google.golang.org/grpc/codes"
+	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -228,7 +232,13 @@ var file_player_proto_rawDesc = []byte{
 	0x13, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x48, 0x65, 0x61, 0x72, 0x74, 0x52, 0x65, 0x73, 0x70,
 	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
 	0x70, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x09, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61,
-	0x6d, 0x70, 0x42, 0x1e, 0x0a, 0x0f, 0x6f, 0x72, 0x67, 0x2e, 0x6d, 0x6d, 0x6f, 0x2e, 0x6d, 0x65,
+	0x6d, 0x70, 0x32, 0x5e, 0x0a, 0x12, 0x50, 0x6c, 0x61, 0x79, 0x65, 0x72, 0x57, 0x6f, 0x72, 0x6c,
+	0x64, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x48, 0x0a, 0x05, 0x6c, 0x6f, 0x67, 0x69,
+	0x6e, 0x12, 0x1e, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x2e, 0x55, 0x73, 0x65, 0x72, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x1f, 0x2e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x2e, 0x55, 0x73, 0x65, 0x72, 0x4c, 0x6f, 0x67, 0x69, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x42, 0x1e, 0x0a, 0x0f, 0x6f, 0x72, 0x67, 0x2e, 0x6d, 0x6d, 0x6f, 0x2e, 0x6d, 0x65,
 	0x73, 0x73, 0x61, 0x67, 0x65, 0x5a, 0x0b, 0x73, 0x72, 0x63, 0x2f, 0x6d, 0x65, 0x73, 0x73, 0x61,
 	0x67, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
@@ -253,8 +263,10 @@ var file_player_proto_goTypes = []interface{}{
 	(*PlayerHeartResponse)(nil), // 3: ProtoMessage.PlayerHeartResponse
 }
 var file_player_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
+	0, // 0: ProtoMessage.PlayerWorldService.login:input_type -> ProtoMessage.UserLoginRequest
+	1, // 1: ProtoMessage.PlayerWorldService.login:output_type -> ProtoMessage.UserLoginResponse
+	1, // [1:2] is the sub-list for method output_type
+	0, // [0:1] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -323,7 +335,7 @@ func file_player_proto_init() {
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
-			NumServices:   0,
+			NumServices:   1,
 		},
 		GoTypes:           file_player_proto_goTypes,
 		DependencyIndexes: file_player_proto_depIdxs,
@@ -333,4 +345,86 @@ func file_player_proto_init() {
 	file_player_proto_rawDesc = nil
 	file_player_proto_goTypes = nil
 	file_player_proto_depIdxs = nil
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConnInterface
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion6
+
+// PlayerWorldServiceClient is the client API for PlayerWorldService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
+type PlayerWorldServiceClient interface {
+	//登录世界服
+	Login(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error)
+}
+
+type playerWorldServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewPlayerWorldServiceClient(cc grpc.ClientConnInterface) PlayerWorldServiceClient {
+	return &playerWorldServiceClient{cc}
+}
+
+func (c *playerWorldServiceClient) Login(ctx context.Context, in *UserLoginRequest, opts ...grpc.CallOption) (*UserLoginResponse, error) {
+	out := new(UserLoginResponse)
+	err := c.cc.Invoke(ctx, "/ProtoMessage.PlayerWorldService/login", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// PlayerWorldServiceServer is the server API for PlayerWorldService service.
+type PlayerWorldServiceServer interface {
+	//登录世界服
+	Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error)
+}
+
+// UnimplementedPlayerWorldServiceServer can be embedded to have forward compatible implementations.
+type UnimplementedPlayerWorldServiceServer struct {
+}
+
+func (*UnimplementedPlayerWorldServiceServer) Login(context.Context, *UserLoginRequest) (*UserLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+
+func RegisterPlayerWorldServiceServer(s *grpc.Server, srv PlayerWorldServiceServer) {
+	s.RegisterService(&_PlayerWorldService_serviceDesc, srv)
+}
+
+func _PlayerWorldService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PlayerWorldServiceServer).Login(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ProtoMessage.PlayerWorldService/Login",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PlayerWorldServiceServer).Login(ctx, req.(*UserLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _PlayerWorldService_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "ProtoMessage.PlayerWorldService",
+	HandlerType: (*PlayerWorldServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "login",
+			Handler:    _PlayerWorldService_Login_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "player.proto",
 }

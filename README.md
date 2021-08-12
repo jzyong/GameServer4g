@@ -11,7 +11,6 @@ Navmesh寻路 [服务器](https://github.com/jzyong/game-server/tree/master/game
 
 ### TODO
 * Influxdb
-* grpc请求，移除register 注册中心rpc
 * mongoDB
 * 多网关测试,消息分发
 * 编写测试客户端（测试tcp通信，模拟登录流程）

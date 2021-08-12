@@ -24,6 +24,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// （测试）
 type String struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

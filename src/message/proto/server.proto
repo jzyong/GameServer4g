@@ -5,11 +5,11 @@ option go_package = "src/message";
 
 //服务器内部消息
 
-//服务器列表
+//服务器列表 （测试）
 message ServerListRequest {
     int32 type = 2; //服务器类型
 }
-
+//服务器列表 （测试）
 message ServerListResponse {
     repeated ServerInfo server = 2; // 服务器列表
 }
@@ -38,7 +38,7 @@ message ServerRegisterUpdateRequest {
     ServerInfo serverInfo = 2;
 }
 
-//rpc
+//rpc  （测试）
 service ServerService {
     //服务器注册
     rpc ServerRegister (ServerInfo) returns (ServerInfo);

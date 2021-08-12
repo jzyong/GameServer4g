@@ -33,6 +33,7 @@ func (this *HallManager) Init() error {
 	util.ZKUpdate(this.ZKConnect, fmt.Sprintf(util.HallConfig, config.Profile, config.Id), string(configBytes))
 	//监听网关连接
 	this.watchGateService()
+	this.watchWorldService()
 
 	//注册服务
 	util.ZKAdd(this.ZKConnect, fmt.Sprintf(util.HallRpcService, config.Profile, config.Id), config.RpcUrl, zk.FlagEphemeral)
@@ -56,7 +57,23 @@ func (this *HallManager) watchGateService() {
 			}
 		}
 	}()
+}
 
+//监听世界服
+func (this *HallManager) watchWorldService() {
+	path := fmt.Sprintf(util.WorldRpcServiceListenPath, config.HallConfigInstance.Profile)
+	children, errors := util.ZKWatchChildrenW(this.ZKConnect, path)
+	go func() {
+		for {
+			select {
+			case worldIds := <-children:
+				log.Infof("world变更为：%v", worldIds)
+				GetClientManager().UpdateWorldClient(worldIds, this.ZKConnect, path)
+			case err := <-errors:
+				log.Warnf("world服务监听异常：%v", err)
+			}
+		}
+	}()
 }
 
 func (this *HallManager) Stop() {

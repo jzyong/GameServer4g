@@ -25,3 +25,11 @@ message PlayerHeartResponse{
 }
 
 
+//登录世界服
+service PlayerWorldService{
+  //登录世界服
+  rpc login(UserLoginRequest) returns (UserLoginResponse);
+
+}
+
+

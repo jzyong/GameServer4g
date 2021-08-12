@@ -24,7 +24,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-//服务器列表
+//服务器列表 （测试）
 type ServerListRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -72,6 +72,7 @@ func (x *ServerListRequest) GetType() int32 {
 	return 0
 }
 
+//服务器列表 （测试）
 type ServerListResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
