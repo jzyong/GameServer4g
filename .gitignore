@@ -4,3 +4,5 @@
 /.idea/
 *.iml
 /src/gate/GateApp
+/src/hall/HallApp
+/src/world/WorldApp
