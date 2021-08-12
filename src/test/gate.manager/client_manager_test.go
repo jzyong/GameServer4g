@@ -99,7 +99,6 @@ func heartRequest() {
 		sendMsg(message.MID_PlayerHeartReq, request)
 		time.Sleep(time.Second * 3)
 	}
-
 }
 
 //接收心跳

@@ -9,7 +9,7 @@ import (
 	"github.com/jzyong/go-mmo-server/src/hall/config"
 )
 
-//网关
+//大厅
 type HallManager struct {
 	util.DefaultModule
 	ZKConnect *zk.Conn //zookeeper连接

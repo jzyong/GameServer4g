@@ -27,7 +27,7 @@ func main() {
 	var err error
 	err = manager.Module.Init()
 	if err != nil {
-		log.Errorf("gate start error: %s", err.Error())
+		log.Errorf("hall start error: %s", err.Error())
 		return
 	}
 	manager.Module.Run()

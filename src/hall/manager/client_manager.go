@@ -8,19 +8,19 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
 	"github.com/jzyong/go-mmo-server/src/core/util"
-	"github.com/jzyong/go-mmo-server/src/hall/handler"
-	"github.com/jzyong/go-mmo-server/src/message"
+	//"github.com/jzyong/go-mmo-server/src/hall/handler"
+	//"github.com/jzyong/go-mmo-server/src/message"
 	"runtime"
 	"strconv"
 	"sync"
 )
 
-//注册消息
-func (this *ClientManager) registerHandlers() {
-	//玩家
-	this.MessageDistribute.RegisterHandler(int32(message.MID_UserLoginReq), network.NewTcpHandler(handler.HandUserLogin))
-
-}
+////注册消息
+//func (this *ClientManager) registerHandlers() {
+//	//玩家
+//	this.MessageDistribute.RegisterHandler(int32(message.MID_UserLoginReq), network.NewTcpHandler(handler.HandUserLogin))
+//
+//}
 
 //管理连接网关的tcp客户端
 type ClientManager struct {
@@ -47,7 +47,7 @@ func (this *ClientManager) Init() error {
 	//开启工作线程池
 	this.MessageDistribute.StartWorkerPool()
 
-	this.registerHandlers()
+	//this.registerHandlers()
 
 	////TODO 测试发送消息 待测试接收消息处理
 	//time.Sleep(time.Second * 3)
@@ -148,3 +148,7 @@ func SendMsg(channel network.Channel, msgId int32, senderId int64, message proto
 	channel.GetMsgChan() <- msg
 	return nil
 }
+
+//func (this *ClientManager) GetMessageDistribute ()  network.MessageDistribute{
+//	return this.MessageDistribute
+//}

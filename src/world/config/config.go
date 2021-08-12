@@ -8,17 +8,15 @@ import (
 )
 
 //配置
-var HallConfigInstance *HallConfig
+var WorldConfigInstance *WorldConfig
 
 //配置文件路径
 var FilePath string
 
 //json配置对象
-type HallConfig struct {
+type WorldConfig struct {
 	//服务器ID
 	Id int32 `json:"id"`
-	//Mongo链接地址
-	MongoUrl string `json:"mongoUrl"`
 	//rpc 地址
 	RpcUrl string `json:"rpcUrl"`
 	//日志级别
@@ -32,9 +30,8 @@ type HallConfig struct {
 }
 
 func init() {
-	HallConfigInstance = &HallConfig{
-		Id:       2,
-		MongoUrl: "127.0.0.1:6070",
+	WorldConfigInstance = &WorldConfig{
+		Id:       1,
 		LogLevel: "debug",
 	}
 	//HallConfigInstance.Reload()
@@ -53,7 +50,7 @@ func PathExists(path string) (bool, error) {
 }
 
 //读取用户的配置文件
-func (hallConfig *HallConfig) Reload() {
+func (worldConfig *WorldConfig) Reload() {
 	if confFileExists, _ := PathExists(FilePath); confFileExists != true {
 		log.Warn("Config File ", FilePath, " is not exist!!")
 		return
@@ -63,7 +60,7 @@ func (hallConfig *HallConfig) Reload() {
 		panic(err)
 	}
 	//将json数据解析到struct中
-	err = json.Unmarshal(data, hallConfig)
+	err = json.Unmarshal(data, worldConfig)
 	if err != nil {
 		log.Error(err)
 		panic(err)

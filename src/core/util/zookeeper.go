@@ -12,8 +12,10 @@ const GateGameService string = "/mmo/%s/service/GateGameTcp/%d"        //gate ga
 const GateGameServiceListenPath string = "/mmo/%s/service/GateGameTcp" //网关服务监听路径
 const GateClientService string = "/mmo/%s/service/GateClientTcp/%d"    //gate client tcp服务
 const HallRpcService string = "/mmo/%s/service/HallRpc/%d"             //hall rpc服务
+const WorldRpcService string = "/mmo/%s/service/WorldRpc/%d"           //world rpc服务
 const HallConfig string = "/mmo/%s/hall%d"                             //hall 配置
 const GateConfig string = "/mmo/%s/gate%d"                             //gate 配置
+const WorldConfig string = "/mmo/%s/world%d"                           //world 配置
 
 //参考：https://www.cnblogs.com/zhichaoma/p/12640064.html
 // https://blog.csdn.net/bingfeilongxin/article/details/88578887

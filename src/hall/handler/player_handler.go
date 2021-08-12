@@ -9,6 +9,10 @@ import (
 	"github.com/jzyong/go-mmo-server/src/message"
 )
 
+func init() {
+	manager.GetClientManager().MessageDistribute.RegisterHandler(int32(message.MID_UserLoginReq), network.NewTcpHandler(HandUserLogin))
+}
+
 //处理玩家登录
 func HandUserLogin(msg network.TcpMessage) bool {
 	request := &message.UserLoginRequest{}
