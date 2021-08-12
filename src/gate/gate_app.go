@@ -6,7 +6,6 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/util"
 	"github.com/jzyong/go-mmo-server/src/gate/config"
 	"github.com/jzyong/go-mmo-server/src/gate/manager"
-	"github.com/jzyong/go-mmo-server/src/gate/rpc"
 	"runtime"
 )
 
@@ -19,10 +18,6 @@ func main() {
 	flag.Parse()
 	config.FilePath = *configPath
 	config.GateConfigInstance.Reload()
-
-	rpc.GateToClusterClient = new(rpc.GateToCluster)
-	rpc.GateToClusterClient.Start(config.GateConfigInstance.ClusterRpcURL)
-	rpc.RegisterToCluster()
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 

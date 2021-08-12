@@ -7,12 +7,15 @@ import (
 	"github.com/jzyong/go-mmo-server/src/gate/config"
 	"github.com/jzyong/go-mmo-server/src/gate/handler"
 	"github.com/jzyong/go-mmo-server/src/message"
+	"sync"
 )
 
 //后端游戏网络管理
 type GameManager struct {
 	util.DefaultModule
-	server network.Server
+	server        network.Server
+	HallGames     map[int32]*GameServerInfo
+	HallGamesLock sync.RWMutex
 }
 
 func NewGameManager() *GameManager {
@@ -23,7 +26,7 @@ func NewGameManager() *GameManager {
 func (this *GameManager) Init() error {
 	log.Info("GameManager:init")
 	//启动网络
-	server, err := network.NewServer("game", config.GateConfigInstance.GameUrl, network.InnerServer)
+	server, err := network.NewServer("game", config.GateConfigInstance.GameUrl, network.InnerServer, nil)
 	if err != nil {
 		return err
 	}
@@ -65,4 +68,13 @@ func (this *GameManager) Stop() {
 	if this.server != nil {
 		this.server.Stop()
 	}
+}
+
+//后端服务器
+type GameServerInfo struct {
+	ServerId   int32
+	ServerType int32
+	Channel    network.Channel
+	State      int32 //服务器状态
+
 }

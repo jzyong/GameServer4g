@@ -1,7 +1,6 @@
 package manager
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"github.com/go-zookeeper/zk"
@@ -9,6 +8,7 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
 	"github.com/jzyong/go-mmo-server/src/core/util"
+	"github.com/jzyong/go-mmo-server/src/hall/config"
 	"github.com/jzyong/go-mmo-server/src/message"
 	"google.golang.org/grpc"
 	"time"
@@ -40,7 +40,7 @@ type ClientManager struct {
 func NewClientManager() *ClientManager {
 	return &ClientManager{
 		gateClients:       make(map[int32]*GateClient),
-		MessageDistribute: network.NewMessageDistribute(uint32(runtime.NumCPU())),
+		MessageDistribute: network.NewMessageDistribute(uint32(runtime.NumCPU()), nil),
 	}
 }
 
@@ -63,18 +63,52 @@ func (this *ClientManager) Init() error {
 	//}
 	//SendMsg(this.gateClient.GetChannel(), int32(message.MID_ServerListRes), 1, &msg)
 
+	//定时发送心跳
+	go func() {
+		for {
+			for _, client := range this.gateClients {
+				sendServerHeartMessage(client.Client.GetChannel())
+			}
+			time.Sleep(time.Second * 3)
+		}
+	}()
+
 	log.Info("ClientManager:inited")
 	return nil
 }
 
+//发送心跳消息
+func sendServerHeartMessage(channel network.Channel) {
+	if channel == nil {
+		return
+	}
+
+	hallConfig := config.HallConfigInstance
+	request := &message.ServerRegisterUpdateRequest{
+		ServerInfo: &message.ServerInfo{
+			Id:    hallConfig.Id,
+			Type:  1,
+			Ip:    hallConfig.RpcUrl,
+			State: 1,
+		},
+	}
+
+	SendMsg(channel, int32(message.MID_ServerRegisterUpdateReq), -1, request)
+
+}
+
 //链接激活
 func clientChannelActive(channel network.Channel) {
+	// 给网关发送注册消息
+	sendServerHeartMessage(channel)
 	log.Infof("创建网关连接：%v", channel.RemoteAddr())
+	// TODO 添加属性
 }
 
 //链接断开
 func clientChannelInactive(channel network.Channel) {
 	log.Infof("网关连接断开：%v", channel.RemoteAddr())
+	//TODO 删除连接
 }
 
 //更新网关客户端
@@ -141,14 +175,14 @@ func (this *ClientManager) UpdateWorldClient(serverIds []string, zkConnect *zk.C
 		this.WorldClientConnect = conn
 		this.PlayerWorldClient = message.NewPlayerWorldServiceClient(conn)
 
-		//TODO 测试grpc
-		context, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
-		response, _ := this.PlayerWorldClient.Login(context, &message.UserLoginRequest{
-			Account:  "player1",
-			Password: "123123",
-		})
-		log.Infof("login return %d", response.PlayerId)
+		////TODO 测试grpc
+		//context, cancel := context.WithTimeout(context.Background(), time.Second)
+		//defer cancel()
+		//response, _ := this.PlayerWorldClient.Login(context, &message.UserLoginRequest{
+		//	Account:  "player1",
+		//	Password: "123123",
+		//})
+		//log.Infof("login return %d", response.PlayerId)
 
 		log.Infof("connect to world %s address:%s", path, serverUrl)
 	}

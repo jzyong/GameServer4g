@@ -16,9 +16,8 @@ func HandleServerList(msg network.TcpMessage) bool {
 	var serverInfo []*message.ServerInfo
 	serverInfo = []*message.ServerInfo{
 		{
-			Id:   1,
-			Ip:   "",
-			Name: "111",
+			Id: 1,
+			Ip: "",
 		},
 	}
 	response := &message.ServerListResponse{

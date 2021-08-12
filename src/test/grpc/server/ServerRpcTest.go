@@ -12,7 +12,6 @@ type ServerServiceImpl struct {
 }
 
 func (server *ServerServiceImpl) ServerRegister(ctx context.Context, in *message.ServerInfo) (*message.ServerInfo, error) {
-	in.Name = "server"
 	log.Printf("%v", in)
 	return in, nil
 }

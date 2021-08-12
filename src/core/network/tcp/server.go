@@ -61,7 +61,7 @@ type serverImpl struct {
 }
 
 //创建网络服务
-func NewServer(name, url string, serverType int32) (Server, error) {
+func NewServer(name, url string, serverType int32, unregisterMethod HandUnregisterMessageMethod) (Server, error) {
 	ipPorts := strings.Split(url, ":")
 	if len(ipPorts) < 2 {
 		return nil, fmt.Errorf("url format error")
@@ -76,7 +76,7 @@ func NewServer(name, url string, serverType int32) (Server, error) {
 		IPVersion:         "tcp4", //暂时都是tcp4
 		IP:                ipPorts[0],
 		Port:              int32(port),
-		MessageDistribute: NewMessageDistribute(uint32(runtime.NumCPU())),
+		MessageDistribute: NewMessageDistribute(uint32(runtime.NumCPU()), unregisterMethod),
 		ChannelManager:    NewChannelManager(),
 		ServerType:        serverType,
 	}, nil

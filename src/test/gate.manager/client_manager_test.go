@@ -34,7 +34,10 @@ func ClientTest(i int32) {
 		return
 	}
 
-	go heartRequest()
+	// go heartRequest()
+
+	//登录
+	userLoginRequest()
 
 	go switchReceiveMessage()
 
@@ -74,7 +77,12 @@ func switchReceiveMessage() {
 		switch message.MID(msg2.GetMsgId()) {
 		case message.MID_PlayerHeartRes:
 			heartResponse(msg2)
+			break
+		case message.MID_UserLoginRes:
+			userLoginResponse(msg2)
+			break
 		}
+
 		time.Sleep(time.Millisecond * 10)
 	}
 
@@ -106,6 +114,22 @@ func heartResponse(tcpMessage network.TcpMessage) {
 	response := &message.PlayerHeartResponse{}
 	proto.Unmarshal(tcpMessage.GetData(), response)
 	log.Infof("收到心跳：%v", response)
+}
+
+//用户登录
+func userLoginRequest() {
+	request := &message.UserLoginRequest{
+		Account:  "user1",
+		Password: "12121",
+	}
+	sendMsg(message.MID_UserLoginReq, request)
+}
+
+//用户登录
+func userLoginResponse(tcpMessage network.TcpMessage) {
+	response := &message.UserLoginResponse{}
+	proto.Unmarshal(tcpMessage.GetData(), response)
+	log.Infof("用户信息：%v", response)
 }
 
 func TestConnectClientServer(t *testing.T) {

@@ -20,21 +20,10 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	result, err := client.ServerRegister(ctx, &message.ServerInfo{
-		Id:           1,
-		BelongID:     1,
-		Ip:           "1",
-		Type:         0,
-		Port:         0,
-		State:        0,
-		Version:      "",
-		Content:      "",
-		Online:       0,
-		MaxUserCount: 0,
-		HttpPort:     0,
-		OpenTime:     "",
-		MaintainTime: "",
-		Name:         "client",
-		Wwwip:        "",
+		Id:    1,
+		Ip:    "1",
+		Type:  0,
+		State: 0,
 	})
 	if err != nil {
 		log.Fatal("%v", err)

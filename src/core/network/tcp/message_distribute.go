@@ -19,19 +19,24 @@ type MessageDistribute interface {
 	SendMessageToTaskQueue(message TcpMessage)
 }
 
+//处理未注册消息，如转发到大厅
+type HandUnregisterMessageMethod func(message TcpMessage)
+
 //Handler 处理器
 type messageDistributeImpl struct {
-	handlers       map[int32]*TcpHandler //存放每个MsgId 所对应的处理方法的map属性
-	WorkerPoolSize uint32                //业务工作Worker池的数量
-	TaskQueue      []chan TcpMessage     //Worker负责取任务的消息队列
+	handlers              map[int32]*TcpHandler       //存放每个MsgId 所对应的处理方法的map属性
+	WorkerPoolSize        uint32                      //业务工作Worker池的数量
+	TaskQueue             []chan TcpMessage           //Worker负责取任务的消息队列
+	HandUnregisterMessage HandUnregisterMessageMethod //处理未注册消息，如转发到大厅
 }
 
-func NewMessageDistribute(workPoolSize uint32) MessageDistribute {
+func NewMessageDistribute(workPoolSize uint32, unregisterMethod HandUnregisterMessageMethod) MessageDistribute {
 	return &messageDistributeImpl{
 		handlers:       make(map[int32]*TcpHandler),
 		WorkerPoolSize: workPoolSize,
 		//一个worker对应一个queue
-		TaskQueue: make([]chan TcpMessage, workPoolSize),
+		TaskQueue:             make([]chan TcpMessage, workPoolSize),
+		HandUnregisterMessage: unregisterMethod,
 	}
 }
 
@@ -51,6 +56,10 @@ func (mh *messageDistributeImpl) SendMessageToTaskQueue(request TcpMessage) {
 func (mh *messageDistributeImpl) RunHandler(msg TcpMessage) {
 	handler, ok := mh.handlers[msg.GetMsgId()]
 	if !ok {
+		if mh.HandUnregisterMessage != nil {
+			mh.HandUnregisterMessage(msg)
+			return
+		}
 		log.Warn("Handler msgId = ", msg.GetMsgId(), " is not FOUND!")
 		return
 	}

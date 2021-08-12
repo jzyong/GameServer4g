@@ -32,7 +32,7 @@ func (this *ClientManager) Init() error {
 	log.Info("ClientManager:init")
 
 	//启动网络
-	server, err := network.NewServer("client", config.GateConfigInstance.ClientUrl, network.ClientServer)
+	server, err := network.NewServer("client", config.GateConfigInstance.ClientUrl, network.ClientServer, unregisterMessageDistribute)
 	if err != nil {
 		return err
 	}
@@ -77,6 +77,14 @@ func clientChannelInactive(channel network.Channel) {
 	} else {
 		log.Warn("用户退出 ip:", channel.RemoteAddr(), " 无用户信息")
 	}
+}
+
+//转发不在本地处理的消息
+func unregisterMessageDistribute(tcpMessage network.TcpMessage) {
+	log.Debugf("转发消息：%d", tcpMessage.GetMsgId())
+	u, _ := tcpMessage.GetChannel().GetProperty("user")
+	user := u.(User)
+	user.SendTcpMessageToHall(tcpMessage)
 }
 
 func (this *ClientManager) Stop() {
