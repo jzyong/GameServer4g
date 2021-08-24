@@ -5,6 +5,7 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	"github.com/jzyong/go-mmo-server/src/core/util"
 	"github.com/jzyong/go-mmo-server/src/hall/config"
+	"github.com/jzyong/go-mmo-server/src/hall/handler"
 	"github.com/jzyong/go-mmo-server/src/hall/manager"
 	"runtime"
 )
@@ -31,6 +32,7 @@ func main() {
 		return
 	}
 	manager.Module.Run()
+	handler.RegisterHandlers()
 	util.WaitForTerminate()
 	manager.Module.Stop()
 	log.Info("hall stop")

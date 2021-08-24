@@ -11,9 +11,9 @@ import (
 	"time"
 )
 
-func init() {
-	manager.GetClientManager().MessageDistribute.RegisterHandler(int32(message.MID_UserLoginReq), network.NewTcpHandler(HandUserLogin))
-}
+//func init() {
+//	manager.GetClientManager().MessageDistribute.RegisterHandler(int32(message.MID_UserLoginReq), network.NewTcpHandler(HandUserLogin))
+//}
 
 //处理玩家登录
 func HandUserLogin(msg network.TcpMessage) bool {
@@ -30,6 +30,7 @@ func HandUserLogin(msg network.TcpMessage) bool {
 	//登录世界服，测试
 	c, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
+	//TODO nil 处理
 	worldResponse, _ := manager.GetClientManager().PlayerWorldClient.Login(c, request)
 	log.Infof("world return %v", worldResponse)
 

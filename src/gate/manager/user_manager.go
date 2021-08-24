@@ -164,13 +164,9 @@ func (u *User) SendToHall(mid message.MID, message proto.Message) {
 //向游戏服发消息
 func (u *User) SendTcpMessageToHall(tcpMessage network.TcpMessage) {
 	if u.GameChannel == nil {
-		//TODO 获取链接
-		//serverInfo, _ := manager.ServerInfoManagerInstance.GetGameServerInfo(0)
-		//if serverInfo == nil {
-		//	log.Error("没有找到一个可用的大厅:", mid)
-		//	return
-		//}
-		//u.GameChannel = serverInfo.Channel
+		//TODO 获取链接 暂时写死，后面根据规则获取分配
+		server := GetGameManager().GetGameServerInfo(1)
+		u.GameChannel = server.Channel
 	}
 	network.SendMsg(u.GameChannel, tcpMessage.GetMsgId(), u.SessionId, u.Id, tcpMessage.GetData())
 }

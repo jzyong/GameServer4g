@@ -5,14 +5,12 @@ import (
 	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
 	"github.com/jzyong/go-mmo-server/src/core/util"
 	"github.com/jzyong/go-mmo-server/src/gate/config"
-	"github.com/jzyong/go-mmo-server/src/gate/handler"
-	"github.com/jzyong/go-mmo-server/src/message"
 )
 
-//注册处理来自客户端的消息
-func (this *ClientManager) registerHandlers() {
-	this.server.RegisterHandler(int32(message.MID_PlayerHeartReq), handler.HandlePlayerHeartReq)
-}
+////注册处理来自客户端的消息
+//func (this *ClientManager) registerHandlers() {
+//	this.server.RegisterHandler(int32(message.MID_PlayerHeartReq), handler.HandlePlayerHeartReq)
+//}
 
 //客户端网络连接管理
 type ClientManager struct {
@@ -39,7 +37,7 @@ func (this *ClientManager) Init() error {
 	this.server = server
 	this.server.SetChannelActive(clientChannelActive)
 	this.server.SetChannelInactive(clientChannelInactive)
-	this.registerHandlers()
+	//this.registerHandlers()
 	go this.server.Start()
 
 	log.Info("ClientManager:inited")
@@ -49,6 +47,11 @@ func (this *ClientManager) Init() error {
 //获取服务器
 func (this *ClientManager) GetServer() network.Server {
 	return this.server
+}
+
+//注册消息
+func (this ClientManager) RegisterHandler(mid int32, handler network.HandlerMethod) {
+	this.server.RegisterHandler(mid, handler)
 }
 
 //链接激活
@@ -83,7 +86,7 @@ func clientChannelInactive(channel network.Channel) {
 func unregisterMessageDistribute(tcpMessage network.TcpMessage) {
 	log.Debugf("转发消息：%d", tcpMessage.GetMsgId())
 	u, _ := tcpMessage.GetChannel().GetProperty("user")
-	user := u.(User)
+	user := u.(*User)
 	user.SendTcpMessageToHall(tcpMessage)
 }
 

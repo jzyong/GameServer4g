@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+//func init() {
+//	manager.GetClientManager().RegisterHandler(int32(message.MID_PlayerHeartReq), HandlePlayerHeartReq)
+//}
+
 //玩家心跳请求
 func HandlePlayerHeartReq(msg network.TcpMessage) bool {
 	response := &message.PlayerHeartResponse{

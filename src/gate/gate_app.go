@@ -5,6 +5,7 @@ import (
 	"github.com/jzyong/go-mmo-server/src/core/log"
 	"github.com/jzyong/go-mmo-server/src/core/util"
 	"github.com/jzyong/go-mmo-server/src/gate/config"
+	"github.com/jzyong/go-mmo-server/src/gate/handler"
 	"github.com/jzyong/go-mmo-server/src/gate/manager"
 	"runtime"
 )
@@ -28,6 +29,9 @@ func main() {
 		return
 	}
 	manager.Module.Run()
+
+	handler.RegisterClientHandler()
+	handler.RegisterGameHandler()
 	util.WaitForTerminate()
 	manager.Module.Stop()
 	log.Info("gate stop")

@@ -77,6 +77,11 @@ func (this *ClientManager) Init() error {
 	return nil
 }
 
+//注册消息
+func (this *ClientManager) RegisterHandler(mid message.MID, method network.HandlerMethod) {
+	this.MessageDistribute.RegisterHandler(int32(mid), network.NewTcpHandler(method))
+}
+
 //发送心跳消息
 func sendServerHeartMessage(channel network.Channel) {
 	if channel == nil {
@@ -94,7 +99,6 @@ func sendServerHeartMessage(channel network.Channel) {
 	}
 
 	SendMsg(channel, int32(message.MID_ServerRegisterUpdateReq), -1, request)
-
 }
 
 //链接激活
