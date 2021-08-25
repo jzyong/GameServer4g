@@ -27,7 +27,7 @@ func NewGameManager() *GameManager {
 func (this *GameManager) Init() error {
 	log.Info("GameManager:init")
 	//启动网络
-	server, err := network.NewServer("game", config.GateConfigInstance.GameUrl, network.InnerServer, nil)
+	server, err := network.NewServer("game", config.GateConfigInstance.GameUrl, network.InnerServer, unregisterGameMessageDistribute)
 	if err != nil {
 		return err
 	}
@@ -102,6 +102,19 @@ func gameChannelInactive(channel network.Channel) {
 		GetGameManager().RemoveHall(serverId)
 		log.Infof("hall server %d close", serverId)
 	}
+}
+
+//转发不在本地处理的消息
+func unregisterGameMessageDistribute(tcpMessage network.TcpMessage) {
+	//转发给客户端
+	log.Debugf("转发消息：%d", tcpMessage.GetMsgId())
+	user, _ := GetUserManager().GetIdUser(tcpMessage.GetObjectId())
+	if user != nil {
+		user.SendMessageToClient(tcpMessage)
+	} else {
+		log.Warnf("%d send message %d fail, user not find", tcpMessage.GetObjectId(), tcpMessage.GetMsgId())
+	}
+
 }
 
 func (this *GameManager) Stop() {

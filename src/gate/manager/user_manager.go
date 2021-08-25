@@ -171,6 +171,15 @@ func (u *User) SendTcpMessageToHall(tcpMessage network.TcpMessage) {
 	network.SendMsg(u.GameChannel, tcpMessage.GetMsgId(), u.SessionId, u.Id, tcpMessage.GetData())
 }
 
+//发送消息给客户端
+func (u *User) SendMessageToClient(tcpMessage network.TcpMessage) {
+	if u.ClientChannel == nil {
+		log.Warn("%d client channel is nil,message %d send fail", u.Id, tcpMessage.GetMsgId())
+		return
+	}
+	network.SendClientMsg(u.ClientChannel, tcpMessage.GetMsgId(), tcpMessage.GetData())
+}
+
 func (u *User) GetGameChanel() network.Channel {
 	if u.GameChannel == nil {
 		//TODO 获取链接

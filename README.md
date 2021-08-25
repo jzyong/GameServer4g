@@ -10,7 +10,6 @@ Navmesh寻路 [服务器](https://github.com/jzyong/game-server/tree/master/game
 
 
 ### TODO
-* Influxdb
 * mongoDB
 * 多网关测试,消息分发
 * 编写测试客户端（测试tcp通信，模拟登录流程） （转发大厅返回消息给client）
