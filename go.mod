@@ -1,4 +1,4 @@
-module github.com/jzyong/go-mmo-server
+module github.com/jzyong/GameServer4g
 
 go 1.14
 
