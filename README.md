@@ -30,15 +30,14 @@ game-world                  |world logic
 
 ### TODO
 * refactoring src
-* mongoDB
-* 多网关测试,消息分发
-* 编写测试客户端（测试tcp通信，模拟登录流程） （转发大厅返回消息给client）
 * add document
-
+* develop manager,api,microservice,
+* develop redis,mongo
+* network optimize
 
 discuss
 ---------
-* QQ交流群：143469012
+* QQ Group：143469012
 
 
 

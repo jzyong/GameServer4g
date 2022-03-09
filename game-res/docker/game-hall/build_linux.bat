@@ -1,4 +1,4 @@
-cd ../../../hall
+cd ../../../game-hall
 SET CGO_ENABLED=0
 SET GOOS=linux
 SET GOARCH=amd64
