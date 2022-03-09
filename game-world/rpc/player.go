@@ -2,8 +2,8 @@ package rpc
 
 import (
 	"context"
-	"github.com/jzyong/go-mmo-server/src/core/log"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-message/message"
+	"github.com/jzyong/golib/log"
 )
 
 type PlayerServiceImpl struct {
@@ -11,7 +11,7 @@ type PlayerServiceImpl struct {
 
 //玩家进入世界服
 func (service *PlayerServiceImpl) Login(ctx context.Context, request *message.UserLoginRequest) (*message.UserLoginResponse, error) {
-	log.Infof("%s 登录", request.GetAccount())
+	log.Info("%s 登录", request.GetAccount())
 	response := &message.UserLoginResponse{
 		PlayerId: 1,
 	}

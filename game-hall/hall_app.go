@@ -18,7 +18,6 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	initConfigAndLog()
 
-	//log.SetLogFile("../../log","gate.log") //正式服需要输出到文件
 	log.Debug("hall:%d starting", config.ApplicationConfigInstance.Id)
 
 	var err error

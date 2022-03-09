@@ -1,10 +1,12 @@
-## 一、目录说明
+&emsp;&emsp;document,code demo,deployment scripts
 
-路径                         |描述
+## Module
+
+directory                   |description
 --------------------------- |------------------------------              
-docker                      |docker运行，镜像制作脚本
+docker                      |docker image run scripts
 
-## 二、常见问题
+## FAQ
 
 1. Github push `Empty reply from server`
 

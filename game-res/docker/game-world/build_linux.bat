@@ -1,4 +1,4 @@
-cd ../../../world
+cd ../../../game-world
 SET CGO_ENABLED=0
 SET GOOS=linux
 SET GOARCH=amd64
