@@ -1,14 +1,15 @@
-package main
+package demo
 
 import (
 	"context"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-message/message"
 	grpc "google.golang.org/grpc"
 	"log"
+	"testing"
 	"time"
 )
 
-func main() {
+func TestClientDial(t *testing.T) {
 	conn, err := grpc.Dial("localhost:1234", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("%v", err)
@@ -26,7 +27,7 @@ func main() {
 		State: 0,
 	})
 	if err != nil {
-		log.Fatal("%v", err)
+		log.Fatalf("%v", err)
 	}
 	log.Printf("%s", result)
 }

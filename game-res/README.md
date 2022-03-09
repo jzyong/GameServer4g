@@ -5,6 +5,7 @@
 directory                   |description
 --------------------------- |------------------------------              
 docker                      |docker image run scripts
+grpc                        |learn demo
 
 ## FAQ
 
