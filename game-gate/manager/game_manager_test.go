@@ -1,12 +1,12 @@
-package net
+package manager
 
 import (
 	"encoding/binary"
 	"fmt"
 	"github.com/golang/protobuf/proto"
-	"github.com/jzyong/go-mmo-server/src/core/log"
-	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-message/message"
+	"github.com/jzyong/golib/log"
+	network "github.com/jzyong/golib/network/tcp"
 	"io"
 	"math/rand"
 	"net"
@@ -24,9 +24,9 @@ func GameTest(i int32) {
 
 	fmt.Println("Game Test ... start")
 
-	conn, err := net.Dial("tcp", "127.0.0.1:6061")
+	conn, err := net.Dial("tcp", "192.168.110.2:6061")
 	if err != nil {
-		log.Errorf("Game start err, exit! %v", err)
+		log.Error("Game start err, exit! %v", err)
 		return
 	}
 
@@ -40,7 +40,7 @@ func GameTest(i int32) {
 		msg, _ := dp.Pack(network.NewInnerMessage(int32(message.MID_ServerListReq), data, 1, 2))
 		_, err = conn.Write(msg)
 		if err != nil {
-			log.Error("client write err: ", err)
+			log.Error("client write err: %v", err)
 			return
 		}
 
@@ -50,12 +50,12 @@ func GameTest(i int32) {
 		buffMsgLength := make([]byte, 4)
 		// read len
 		if _, err := io.ReadFull(conn, buffMsgLength); err != nil {
-			log.Error("read msg length error", err)
+			log.Error("read msg length error %v", err)
 		}
 		var msgLength = uint32(binary.LittleEndian.Uint32(buffMsgLength))
 		//最大长度验证
 		if msgLength > 10000 {
-			log.Warnf("消息太长：%d\n", msgLength)
+			log.Warn("消息太长：%d\n", msgLength)
 		}
 		msgData := make([]byte, msgLength)
 		if _, err := io.ReadFull(conn, msgData); err != nil {
@@ -67,14 +67,14 @@ func GameTest(i int32) {
 		//拆包，得到msgid 和 数据 放在msg中
 		msg2, err := dp2.Unpack(msgData, msgLength)
 		if err != nil {
-			log.Error("unpack error ", err)
+			log.Error("unpack error %v", err)
 			return
 		}
 		fmt.Println("==> Recv Msg: ID=", msg2.GetMsgId(), ", len=", msgLength, ", data=", string(msg2.GetData()), ",time=", msg2.GetTime())
 		response := &message.ServerListResponse{}
 		proto.Unmarshal(msg2.GetData(), response)
 
-		log.Infof("收到消息：%v", response)
+		log.Info("收到消息：%v", response)
 
 		time.Sleep(time.Second)
 	}

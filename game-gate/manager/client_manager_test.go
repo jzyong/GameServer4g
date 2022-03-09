@@ -1,12 +1,12 @@
-package net
+package manager
 
 import (
 	"encoding/binary"
 	"fmt"
 	"github.com/golang/protobuf/proto"
-	"github.com/jzyong/go-mmo-server/src/core/log"
-	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-message/message"
+	"github.com/jzyong/golib/log"
+	network "github.com/jzyong/golib/network/tcp"
 	"io"
 	"net"
 	"testing"
@@ -30,7 +30,7 @@ func ClientTest(i int32) {
 	var err error
 	clientConn, err = net.Dial("tcp", "192.168.110.2:6060")
 	if err != nil {
-		log.Errorf("client start err, exit! %v", err)
+		log.Error("client start err, exit! %v", err)
 		return
 	}
 
@@ -52,12 +52,12 @@ func switchReceiveMessage() {
 		buffMsgLength := make([]byte, 4)
 		// read len
 		if _, err := io.ReadFull(clientConn, buffMsgLength); err != nil {
-			log.Error("read msg length error", err)
+			log.Error("read msg length error %v", err)
 		}
 		var msgLength = uint32(binary.LittleEndian.Uint32(buffMsgLength))
 		//最大长度验证
 		if msgLength > 10000 {
-			log.Warnf("消息太长：%d\n", msgLength)
+			log.Warn("消息太长：%d\n", msgLength)
 		}
 		msgData := make([]byte, msgLength)
 		if _, err := io.ReadFull(clientConn, msgData); err != nil {
@@ -69,7 +69,7 @@ func switchReceiveMessage() {
 		//拆包，得到msgid 和 数据 放在msg中
 		msg2, err := dp2.Unpack(msgData, msgLength)
 		if err != nil {
-			log.Error("unpack error ", err)
+			log.Error("unpack error %v", err)
 			return
 		}
 		fmt.Println("==> Recv Msg: ID=", msg2.GetMsgId(), ", len=", msgLength)
@@ -95,7 +95,7 @@ func sendMsg(mid message.MID, message proto.Message) {
 	msg, _ := dp.Pack(network.NewClientMessage(int32(mid), data))
 	_, err = clientConn.Write(msg)
 	if err != nil {
-		log.Errorf("消息：%v 发送失败 %v ", mid, err)
+		log.Error("消息：%v 发送失败 %v ", mid, err)
 		return
 	}
 }
@@ -113,7 +113,7 @@ func heartRequest() {
 func heartResponse(tcpMessage network.TcpMessage) {
 	response := &message.PlayerHeartResponse{}
 	proto.Unmarshal(tcpMessage.GetData(), response)
-	log.Infof("收到心跳：%v", response)
+	log.Info("收到心跳：%v", response)
 }
 
 //用户登录
@@ -129,7 +129,7 @@ func userLoginRequest() {
 func userLoginResponse(tcpMessage network.TcpMessage) {
 	response := &message.UserLoginResponse{}
 	proto.Unmarshal(tcpMessage.GetData(), response)
-	log.Infof("用户信息：%v", response)
+	log.Info("用户信息：%v", response)
 }
 
 func TestConnectClientServer(t *testing.T) {

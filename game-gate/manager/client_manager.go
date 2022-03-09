@@ -76,7 +76,7 @@ func clientChannelInactive(channel network.Channel) {
 		}
 
 	} else {
-		log.Warn("用户退出 ip:", channel.RemoteAddr(), " 无用户信息")
+		log.Warn("用户退出 ip: %v 无用户信息", channel.RemoteAddr())
 	}
 }
 
