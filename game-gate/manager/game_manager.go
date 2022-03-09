@@ -1,11 +1,11 @@
 package manager
 
 import (
-	"github.com/jzyong/go-mmo-server/src/core/log"
-	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
-	"github.com/jzyong/go-mmo-server/src/core/util"
-	"github.com/jzyong/go-mmo-server/src/gate/config"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-gate/config"
+	"github.com/jzyong/GameServer4g/game-message/message"
+	"github.com/jzyong/golib/log"
+	network "github.com/jzyong/golib/network/tcp"
+	"github.com/jzyong/golib/util"
 	"sync"
 )
 
@@ -17,75 +17,80 @@ type GameManager struct {
 	HallGamesLock sync.RWMutex
 }
 
-func NewGameManager() *GameManager {
-	return &GameManager{
-		HallGames: make(map[int32]*GameServerInfo),
-	}
+var gameManager = &GameManager{
+	HallGames: make(map[int32]*GameServerInfo),
 }
 
-//@
-func (this *GameManager) Init() error {
+func GetGameManager() *GameManager {
+	return gameManager
+}
+
+//
+func (m *GameManager) Init() error {
 	log.Info("GameManager:init")
 	//启动网络
-	server, err := network.NewServer("game", config.GateConfigInstance.GameUrl, network.InnerServer, unregisterGameMessageDistribute)
+	server, err := network.NewServer("game", config.ApplicationConfigInstance.GameUrl, network.InnerServer, unregisterGameMessageDistribute)
 	if err != nil {
 		return err
 	}
-	this.server = server
-	this.server.SetChannelActive(gameChannelActive)
-	this.server.SetChannelInactive(gameChannelInactive)
-	//this.registerHandlers()
-	go this.server.Start()
+	m.server = server
+	m.server.SetChannelActive(gameChannelActive)
+	m.server.SetChannelInactive(gameChannelInactive)
+	//m.registerHandlers()
+	go m.server.Start()
 
 	log.Info("GameManager:inited")
 	return nil
 }
 
-func GetGameManager() *GameManager {
-	return Module.GameManager
-}
-
 //获取服务器
-func (this *GameManager) GetServer() network.Server {
-	return this.server
+func (m *GameManager) GetServer() network.Server {
+	return m.server
 }
 
 //注册消息
-func (this GameManager) RegisterHandler(mid int32, handler network.HandlerMethod) {
-	this.server.RegisterHandler(mid, handler)
+func (m *GameManager) RegisterHandler(mid int32, handler network.HandlerMethod) {
+	m.server.RegisterHandler(mid, handler)
 }
 
 //更新服务器列表
-func (this *GameManager) UpdateHallServerInfo(serverInfo *message.ServerInfo, channel network.Channel) {
-	this.HallGamesLock.Lock()
-	defer this.HallGamesLock.Unlock()
+func (m *GameManager) UpdateHallServerInfo(serverInfo *message.ServerInfo, channel network.Channel) {
+	m.HallGamesLock.Lock()
+	defer m.HallGamesLock.Unlock()
 
-	hallGame, ok := this.HallGames[serverInfo.GetId()]
+	hallGame, ok := m.HallGames[serverInfo.GetId()]
 	if !ok {
 		hallGame = &GameServerInfo{
 			ServerId: serverInfo.GetId(),
 		}
-		this.HallGames[serverInfo.GetId()] = hallGame
+		m.HallGames[serverInfo.GetId()] = hallGame
 		channel.SetProperty("serverId", serverInfo.GetId())
-		log.Infof("server %d-%d %s register to gate", serverInfo.GetType(), serverInfo.GetId(), serverInfo.GetIp())
+		log.Info("server %d-%d %s register to gate", serverInfo.GetType(), serverInfo.GetId(), serverInfo.GetIp())
 	}
 	hallGame.State = serverInfo.GetState()
 	hallGame.ServerType = serverInfo.GetType()
 	hallGame.Channel = channel
 }
 
-func (this *GameManager) RemoveHall(serverId int32) {
-	this.HallGamesLock.Lock()
-	defer this.HallGamesLock.Unlock()
-	delete(this.HallGames, serverId)
+func (m *GameManager) RemoveHall(serverId int32) {
+	m.HallGamesLock.Lock()
+	defer m.HallGamesLock.Unlock()
+	delete(m.HallGames, serverId)
 }
 
 //获取大厅后端
-func (this *GameManager) GetGameServerInfo(serverId int32) *GameServerInfo {
-	this.HallGamesLock.Lock()
-	defer this.HallGamesLock.Unlock()
-	server := this.HallGames[serverId]
+func (m *GameManager) GetGameServerInfo(serverId int32) *GameServerInfo {
+	m.HallGamesLock.Lock()
+	defer m.HallGamesLock.Unlock()
+	server := m.HallGames[serverId]
 	return server
+}
+
+func (m *GameManager) Stop() {
+	// 关闭服务器
+	if m.server != nil {
+		m.server.Stop()
+	}
 }
 
 //链接激活
@@ -100,28 +105,21 @@ func gameChannelInactive(channel network.Channel) {
 	if err == nil {
 		serverId := id.(int32)
 		GetGameManager().RemoveHall(serverId)
-		log.Infof("hall server %d close", serverId)
+		log.Info("hall server %d close", serverId)
 	}
 }
 
 //转发不在本地处理的消息
 func unregisterGameMessageDistribute(tcpMessage network.TcpMessage) {
 	//转发给客户端
-	log.Debugf("转发消息：%d", tcpMessage.GetMsgId())
+	log.Debug("转发消息：%d", tcpMessage.GetMsgId())
 	user, _ := GetUserManager().GetIdUser(tcpMessage.GetObjectId())
 	if user != nil {
 		user.SendMessageToClient(tcpMessage)
 	} else {
-		log.Warnf("%d send message %d fail, user not find", tcpMessage.GetObjectId(), tcpMessage.GetMsgId())
+		log.Warn("%d send message %d fail, user not find", tcpMessage.GetObjectId(), tcpMessage.GetMsgId())
 	}
 
-}
-
-func (this *GameManager) Stop() {
-	// 关闭服务器
-	if this.server != nil {
-		this.server.Stop()
-	}
 }
 
 //后端服务器

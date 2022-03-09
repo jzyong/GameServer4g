@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"github.com/jzyong/go-mmo-server/src/core/log"
-	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-message/message"
+	"github.com/jzyong/golib/log"
+	network "github.com/jzyong/golib/network/tcp"
 	"time"
 )
 
@@ -16,7 +16,7 @@ func HandlePlayerHeartReq(msg network.TcpMessage) bool {
 	response := &message.PlayerHeartResponse{
 		Timestamp: time.Now().Unix(),
 	}
-	log.Infof("%v 返回心跳%d", msg.GetChannel().RemoteAddr(), response.GetTimestamp())
+	log.Info("%v 返回心跳%d", msg.GetChannel().RemoteAddr(), response.GetTimestamp())
 	network.SendClientProtoMsg(msg.GetChannel(), int32(message.MID_PlayerHeartRes), response)
 	return true
 }

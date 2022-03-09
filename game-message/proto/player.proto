@@ -1,0 +1,35 @@
+syntax = "proto3";
+package ProtoMessage;
+option java_package = "org.mmo.message";
+option go_package = "/message";
+
+//玩家
+
+//用户登录
+message UserLoginRequest {
+  string account = 1; //账号
+  string password = 2; //密码
+}
+//用户登录
+message UserLoginResponse {
+  int64 playerId = 1; //玩家id
+}
+
+//心跳消息
+message PlayerHeartRequest{
+
+}
+//心跳消息
+message PlayerHeartResponse{
+  int64 timestamp = 1;  //时间戳s
+}
+
+
+//登录世界服
+service PlayerWorldService{
+  //登录世界服
+  rpc login(UserLoginRequest) returns (UserLoginResponse);
+
+}
+
+

@@ -3,10 +3,10 @@ package manager
 import (
 	"errors"
 	"github.com/golang/protobuf/proto"
-	"github.com/jzyong/go-mmo-server/src/core/log"
-	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
-	"github.com/jzyong/go-mmo-server/src/core/util"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-message/message"
+	"github.com/jzyong/golib/log"
+	network "github.com/jzyong/golib/network/tcp"
+	"github.com/jzyong/golib/util"
 	"sync"
 )
 
@@ -19,19 +19,17 @@ type UserManager struct {
 	IdUserLock      sync.RWMutex
 }
 
-func NewUserManager() *UserManager {
-	return &UserManager{
-		SessionUser: make(map[int64]*User),
-		IdUser:      make(map[int64]*User),
-	}
+var userManager = &UserManager{
+	SessionUser: make(map[int64]*User),
+	IdUser:      make(map[int64]*User),
 }
 
 func GetUserManager() *UserManager {
-	return Module.UserManager
+	return userManager
 }
 
 //初始化
-func (this *UserManager) Init() error {
+func (m *UserManager) Init() error {
 	log.Info("UserManager:init")
 	// 初始化
 
@@ -40,61 +38,61 @@ func (this *UserManager) Init() error {
 }
 
 //向SessionMap加用户
-func (manager *UserManager) AddSessionUser(user *User) {
-	manager.SessionUserLock.Lock()
-	defer manager.SessionUserLock.Unlock()
+func (m *UserManager) AddSessionUser(user *User) {
+	m.SessionUserLock.Lock()
+	defer m.SessionUserLock.Unlock()
 	//log.Debugf("%p  %p",user,*user)
-	manager.SessionUser[user.SessionId] = user
+	m.SessionUser[user.SessionId] = user
 }
 
-func (manager *UserManager) AddIdUser(user *User) {
-	manager.IdUserLock.Lock()
-	defer manager.IdUserLock.Unlock()
+func (m *UserManager) AddIdUser(user *User) {
+	m.IdUserLock.Lock()
+	defer m.IdUserLock.Unlock()
 	//log.Debugf("%p  %p",user,*user)
-	manager.IdUser[user.Id] = user
+	m.IdUser[user.Id] = user
 }
 
-func (manager *UserManager) GetSessionUser(sessionId int64) (*User, error) {
-	manager.SessionUserLock.RLock()
-	defer manager.SessionUserLock.RUnlock()
-	if user, ok := manager.SessionUser[sessionId]; ok {
+func (m *UserManager) GetSessionUser(sessionId int64) (*User, error) {
+	m.SessionUserLock.RLock()
+	defer m.SessionUserLock.RUnlock()
+	if user, ok := m.SessionUser[sessionId]; ok {
 		return user, nil
 	} else {
 		return nil, errors.New("user not found")
 	}
 }
 
-func (manager *UserManager) GetIdUser(id int64) (*User, error) {
-	manager.IdUserLock.RLock()
-	defer manager.IdUserLock.RUnlock()
-	if user, ok := manager.IdUser[id]; ok {
+func (m *UserManager) GetIdUser(id int64) (*User, error) {
+	m.IdUserLock.RLock()
+	defer m.IdUserLock.RUnlock()
+	if user, ok := m.IdUser[id]; ok {
 		return user, nil
 	} else {
 		return nil, errors.New("user not found")
 	}
 }
 
-func (manager *UserManager) GetUserCount() int {
-	return len(manager.SessionUser)
+func (m *UserManager) GetUserCount() int {
+	return len(m.SessionUser)
 }
 
-func (manager *UserManager) RemoveSessionUser(sessionId int64) {
-	manager.SessionUserLock.Lock()
-	defer manager.SessionUserLock.Unlock()
-	delete(manager.SessionUser, sessionId)
+func (m *UserManager) RemoveSessionUser(sessionId int64) {
+	m.SessionUserLock.Lock()
+	defer m.SessionUserLock.Unlock()
+	delete(m.SessionUser, sessionId)
 }
 
-func (manager *UserManager) RemoveIdUser(id int64) {
-	manager.IdUserLock.Lock()
-	defer manager.IdUserLock.Unlock()
-	delete(manager.IdUser, id)
+func (m *UserManager) RemoveIdUser(id int64) {
+	m.IdUserLock.Lock()
+	defer m.IdUserLock.Unlock()
+	delete(m.IdUser, id)
 }
 
 //用户离线
-func (manager *UserManager) UserOffLine(userChannel network.Channel, reason OffLineReason) {
+func (m *UserManager) UserOffLine(userChannel network.Channel, reason OffLineReason) {
 	u, err := userChannel.GetProperty("user")
 	if err != nil {
-		log.Warnf("获取属性异常 %s", err)
+		log.Warn("获取属性异常 %s", err)
 		return
 	}
 	user := u.(*User)
@@ -103,12 +101,12 @@ func (manager *UserManager) UserOffLine(userChannel network.Channel, reason OffL
 
 	user.ClientChannel = nil
 	user.GameChannel = nil
-	manager.RemoveIdUser(user.Id)
-	manager.RemoveSessionUser(user.SessionId)
-	log.Infof("%d-%v 离线因为：%d 总人数：%d", user.Id, userChannel.RemoteAddr(), reason, manager.GetUserCount())
+	m.RemoveIdUser(user.Id)
+	m.RemoveSessionUser(user.SessionId)
+	log.Info("%d-%v 离线因为：%d 总人数：%d", user.Id, userChannel.RemoteAddr(), reason, m.GetUserCount())
 }
 
-func (this *UserManager) Stop() {
+func (m *UserManager) Stop() {
 }
 
 //离线原因

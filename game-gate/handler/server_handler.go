@@ -2,17 +2,17 @@ package handler
 
 import (
 	"github.com/golang/protobuf/proto"
-	"github.com/jzyong/go-mmo-server/src/core/log"
-	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
-	"github.com/jzyong/go-mmo-server/src/gate/manager"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-gate/manager"
+	"github.com/jzyong/GameServer4g/game-message/message"
+	"github.com/jzyong/golib/log"
+	network "github.com/jzyong/golib/network/tcp"
 )
 
 //获取服务器列表 (遗弃)
 func HandleServerList(msg network.TcpMessage) bool {
 	request := &message.ServerListRequest{}
 	proto.Unmarshal(msg.GetData(), request)
-	log.Infof("请求%d", request.GetType())
+	log.Info("请求%d", request.GetType())
 
 	var serverInfo []*message.ServerInfo
 	serverInfo = []*message.ServerInfo{

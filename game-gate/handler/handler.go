@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/jzyong/go-mmo-server/src/gate/manager"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-gate/manager"
+	"github.com/jzyong/GameServer4g/game-message/message"
 )
 
 //注册client handler

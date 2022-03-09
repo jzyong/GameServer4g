@@ -1,0 +1,6 @@
+2022/03/09 11:58:55 [INFO]client_manager.go(23)--> ClientManager:init
+2022/03/09 11:58:55 [INFO]client_manager.go(36)--> ClientManager:inited
+2022/03/09 11:58:55 [INFO]message_distribute.go(78)--> Add handler 100103 
+2022/03/09 13:38:11 [INFO]gate_manager.go(27)--> GateManager:init
+2022/03/09 13:38:11 [ERROR]zookeeper_util.go(20)--> zk: server list must not be empty
+2022/03/09 13:38:11 [ERROR]zookeeper_util.go(90)--> 更新节点/game//gate2 失败，zk: invalid path
