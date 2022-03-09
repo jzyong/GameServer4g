@@ -4,3 +4,37 @@
 2022/03/09 13:38:11 [INFO]gate_manager.go(27)--> GateManager:init
 2022/03/09 13:38:11 [ERROR]zookeeper_util.go(20)--> zk: server list must not be empty
 2022/03/09 13:38:11 [ERROR]zookeeper_util.go(90)--> 更新节点/game//gate2 失败，zk: invalid path
+2022/03/09 14:02:45 [INFO]gate_manager.go(27)--> GateManager:init
+2022/03/09 14:02:48 [INFO]zookeeper_util.go(60)--> create parent node：/game
+2022/03/09 14:02:48 [INFO]zookeeper_util.go(60)--> create parent node：/game/jzy
+2022/03/09 14:02:48 [INFO]zookeeper_util.go(68)-->  zookeeper createnote: /game/jzy/gate1 
+2022/03/09 14:02:48 [INFO]zookeeper_util.go(60)--> create parent node：/game/jzy/service
+2022/03/09 14:02:48 [INFO]zookeeper_util.go(60)--> create parent node：/game/jzy/service/GateGameTcp
+2022/03/09 14:02:48 [INFO]zookeeper_util.go(68)-->  zookeeper createnote: /game/jzy/service/GateGameTcp/1 
+2022/03/09 14:02:48 [INFO]zookeeper_util.go(60)--> create parent node：/game/jzy/service/GateClientTcp
+2022/03/09 14:02:48 [INFO]zookeeper_util.go(68)-->  zookeeper createnote: /game/jzy/service/GateClientTcp/1 
+2022/03/09 14:02:48 [INFO]gate_manager.go(42)--> GateManager:inited
+2022/03/09 14:02:48 [INFO]client_manager.go(23)--> ClientManager:init
+2022/03/09 14:02:48 [INFO]client_manager.go(36)--> ClientManager:inited
+2022/03/09 14:02:48 [INFO]game_manager.go(30)--> GameManager:init
+2022/03/09 14:02:48 [INFO]game_manager.go(42)--> GameManager:inited
+2022/03/09 14:02:48 [INFO]user_manager.go(33)--> UserManager:init
+2022/03/09 14:02:48 [INFO]user_manager.go(36)--> UserManager:inited
+2022/03/09 14:02:48 [INFO]server.go(90)--> [START] Server name: game,listener at IP: 192.168.110.2, Port 6061 is starting
+2022/03/09 14:02:48 [INFO]server.go(90)--> [START] Server name: client,listener at IP: 192.168.110.2, Port 6060 is starting
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=0, string= is started.)
+2022/03/09 14:02:48 [INFO]message_distribute.go(78)--> Add handler 100103 
+2022/03/09 14:02:48 [INFO]message_distribute.go(78)--> Add handler 1 
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=2, string= is started.)
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=1, string= is started.)
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=5, string= is started.)
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=5, string= is started.)
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=3, string= is started.)
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=3, string= is started.)
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=4, string= is started.)
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=2, string= is started.)
+2022/03/09 14:02:48 [INFO]server.go(112)--> start server  %!(EXTRA string=client, string= success, now listening...)
+2022/03/09 14:02:48 [INFO]server.go(112)--> start server  %!(EXTRA string=game, string= success, now listening...)
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=1, string= is started.)
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=4, string= is started.)
+2022/03/09 14:02:48 [INFO]message_distribute.go(83)--> Worker ID = %!(EXTRA int=0, string= is started.)

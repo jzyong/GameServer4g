@@ -3,6 +3,6 @@
 #idea 文件
 /.idea/
 *.iml
-/src/gate/GateApp
-/src/hall/HallApp
-/src/world/WorldApp
+/game-gate/GateApp
+/game-hall/HallApp
+/game-world/WorldApp
