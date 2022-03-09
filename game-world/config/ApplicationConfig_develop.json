@@ -1,7 +1,6 @@
 {
   "id": 1,
   "rpcUrl": "192.168.110.2:6080",
-  "LogFileName": "",
   "LogLevel": "debug",
   "zookeeperUrls": [
     "192.168.110.2:2181"
