@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"github.com/jzyong/go-mmo-server/src/hall/manager"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-hall/manager"
+	"github.com/jzyong/GameServer4g/game-message/message"
 )
 
 //注册消息处理器

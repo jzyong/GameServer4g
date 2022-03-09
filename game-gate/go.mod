@@ -7,7 +7,6 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/jzyong/GameServer4g/game-message v0.0.0-00010101000000-000000000000
 	github.com/jzyong/GameServer4g/game-common v0.0.0-00010101000000-000000000000
-	github.com/jzyong/go-mmo-server v0.0.1
 	github.com/jzyong/golib v0.0.8
 )
 

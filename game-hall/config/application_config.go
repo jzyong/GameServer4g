@@ -2,19 +2,19 @@ package config
 
 import (
 	"encoding/json"
-	"github.com/jzyong/go-mmo-server/src/core/log"
+	"github.com/jzyong/golib/log"
 	"io/ioutil"
 	"os"
 )
 
 //配置
-var HallConfigInstance *HallConfig
+var ApplicationConfigInstance *ApplicationConfig
 
 //配置文件路径
 var FilePath string
 
 //json配置对象
-type HallConfig struct {
+type ApplicationConfig struct {
 	//服务器ID
 	Id int32 `json:"id"`
 	//Mongo链接地址
@@ -23,8 +23,6 @@ type HallConfig struct {
 	RpcUrl string `json:"rpcUrl"`
 	//日志级别
 	LogLevel string "debug"
-	//日志名称
-	LogFileName string
 	//zookeeper 地址
 	ZookeeperUrls []string `json:"zookeeperUrls"`
 	//自定义配置
@@ -32,7 +30,7 @@ type HallConfig struct {
 }
 
 func init() {
-	HallConfigInstance = &HallConfig{
+	ApplicationConfigInstance = &ApplicationConfig{
 		Id:       2,
 		MongoUrl: "127.0.0.1:6070",
 		LogLevel: "debug",
@@ -53,7 +51,7 @@ func PathExists(path string) (bool, error) {
 }
 
 //读取用户的配置文件
-func (hallConfig *HallConfig) Reload() {
+func (hallConfig *ApplicationConfig) Reload() {
 	if confFileExists, _ := PathExists(FilePath); confFileExists != true {
 		log.Warn("Config File ", FilePath, " is not exist!!")
 		return
@@ -65,7 +63,7 @@ func (hallConfig *HallConfig) Reload() {
 	//将json数据解析到struct中
 	err = json.Unmarshal(data, hallConfig)
 	if err != nil {
-		log.Error(err)
+		log.Error("%v", err)
 		panic(err)
 	}
 }

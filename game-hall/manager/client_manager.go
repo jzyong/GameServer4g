@@ -5,27 +5,17 @@ import (
 	"fmt"
 	"github.com/go-zookeeper/zk"
 	"github.com/golang/protobuf/proto"
-	"github.com/jzyong/go-mmo-server/src/core/log"
-	network "github.com/jzyong/go-mmo-server/src/core/network/tcp"
-	"github.com/jzyong/go-mmo-server/src/core/util"
-	"github.com/jzyong/go-mmo-server/src/hall/config"
-	"github.com/jzyong/go-mmo-server/src/message"
+	"github.com/jzyong/GameServer4g/game-hall/config"
+	"github.com/jzyong/GameServer4g/game-message/message"
+	"github.com/jzyong/golib/log"
+	network "github.com/jzyong/golib/network/tcp"
+	"github.com/jzyong/golib/util"
 	"google.golang.org/grpc"
-	"time"
-
-	//"github.com/jzyong/go-mmo-server/src/hall/handler"
-	//"github.com/jzyong/go-mmo-server/src/message"
 	"runtime"
 	"strconv"
 	"sync"
+	"time"
 )
-
-////注册消息
-//func (this *ClientManager) registerHandlers() {
-//	//玩家
-//	this.MessageDistribute.RegisterHandler(int32(message.MID_UserLoginReq), network.NewTcpHandler(handler.HandUserLogin))
-//
-//}
 
 //管理连接网关的tcp客户端
 type ClientManager struct {
@@ -37,36 +27,34 @@ type ClientManager struct {
 	PlayerWorldClient  message.PlayerWorldServiceClient
 }
 
-func NewClientManager() *ClientManager {
-	return &ClientManager{
-		gateClients:       make(map[int32]*GateClient),
-		MessageDistribute: network.NewMessageDistribute(uint32(runtime.NumCPU()), nil),
-	}
+var clientManager = &ClientManager{
+	gateClients:       make(map[int32]*GateClient),
+	MessageDistribute: network.NewMessageDistribute(uint32(runtime.NumCPU()), nil),
 }
 
 func GetClientManager() *ClientManager {
-	return Module.ClientManager
+	return clientManager
 }
 
-func (this *ClientManager) Init() error {
+func (m *ClientManager) Init() error {
 	log.Info("ClientManager:init")
 
 	//开启工作线程池
-	this.MessageDistribute.StartWorkerPool()
+	m.MessageDistribute.StartWorkerPool()
 
-	//this.registerHandlers()
+	//m.registerHandlers()
 
 	////TODO 测试发送消息 待测试接收消息处理
 	//time.Sleep(time.Second * 3)
 	//msg := message.UserLoginResponse{
 	//	PlayerId: 1,
 	//}
-	//SendMsg(this.gateClient.GetChannel(), int32(message.MID_ServerListRes), 1, &msg)
+	//SendMsg(m.gateClient.GetChannel(), int32(message.MID_ServerListRes), 1, &msg)
 
 	//定时发送心跳
 	go func() {
 		for {
-			for _, client := range this.gateClients {
+			for _, client := range m.gateClients {
 				sendServerHeartMessage(client.Client.GetChannel())
 			}
 			time.Sleep(time.Second * 3)
@@ -78,8 +66,96 @@ func (this *ClientManager) Init() error {
 }
 
 //注册消息
-func (this *ClientManager) RegisterHandler(mid message.MID, method network.HandlerMethod) {
-	this.MessageDistribute.RegisterHandler(int32(mid), network.NewTcpHandler(method))
+func (m *ClientManager) RegisterHandler(mid message.MID, method network.HandlerMethod) {
+	m.MessageDistribute.RegisterHandler(int32(mid), network.NewTcpHandler(method))
+}
+
+//更新网关客户端
+func (m *ClientManager) UpdateGateClient(gateServerIds []string, zkConnect *zk.Conn, path string) {
+	m.gateClientsLock.Lock()
+	defer m.gateClientsLock.Unlock()
+	//遍历添加新连接
+	for _, gateIdStr := range gateServerIds {
+		gateId, err := strconv.ParseInt(gateIdStr, 10, 32)
+		if err != nil {
+			log.Warn("网关id 异常 %v ：%v", gateIdStr, err)
+		}
+		if _, ok := m.gateClients[int32(gateId)]; ok {
+			continue
+		} else {
+			//连接网关
+			serverUrl := util.ZKGet(zkConnect, fmt.Sprintf("%v/%v", path, gateIdStr))
+			var client = &GateClient{
+				GateId:  int32(gateId),
+				GateUrl: serverUrl,
+			}
+			m.gateClients[int32(gateId)] = client
+			log.Info("新增网关客户端：%v 地址为：%v", gateIdStr, serverUrl)
+			tcpClient, err := network.NewClient(fmt.Sprintf("GateClient-%v", gateIdStr), serverUrl, m.MessageDistribute)
+			if err != nil {
+				log.Warn("网关id 异常 %v ：%v", gateIdStr, err)
+				continue
+			}
+			client.Client = tcpClient
+			tcpClient.SetChannelActive(clientChannelActive)
+			tcpClient.SetChannelInactive(clientChannelInactive)
+			go tcpClient.Start()
+		}
+	}
+	//删除已关闭的网关
+	for gateId, _ := range m.gateClients {
+		gateIdStr := strconv.Itoa(int(gateId))
+		if util.SliceContains(gateServerIds, gateIdStr) < 0 {
+			m.gateClients[gateId].Client.Stop()
+			delete(m.gateClients, gateId)
+		}
+	}
+}
+
+//更新world客户端
+func (m *ClientManager) UpdateWorldClient(serverIds []string, zkConnect *zk.Conn, path string) {
+	//遍历添加新连接
+	for _, IdStr := range serverIds {
+		_, err := strconv.ParseInt(IdStr, 10, 32)
+		if err != nil {
+			log.Warn("world id 异常 %v ：%v", IdStr, err)
+		}
+		//关闭之前
+		if m.WorldClientConnect != nil {
+			m.WorldClientConnect.Close()
+		}
+
+		//启动新连接
+		serverUrl := util.ZKGet(zkConnect, fmt.Sprintf("%v/%v", path, IdStr))
+		conn, err := grpc.Dial(serverUrl, grpc.WithInsecure())
+		if err != nil {
+			log.Warn("%v", err)
+		}
+		m.WorldClientConnect = conn
+		m.PlayerWorldClient = message.NewPlayerWorldServiceClient(conn)
+
+		////TODO 测试grpc
+		//context, cancel := context.WithTimeout(context.Background(), time.Second)
+		//defer cancel()
+		//response, _ := m.PlayerWorldClient.Login(context, &message.UserLoginRequest{
+		//	Account:  "player1",
+		//	Password: "123123",
+		//})
+		//log.Infof("login return %d", response.PlayerId)
+
+		log.Info("connect to world %s address:%s", path, serverUrl)
+	}
+
+}
+
+func (m *ClientManager) Stop() {
+	// 关闭服务器
+	for _, gateClient := range m.gateClients {
+		gateClient.Client.Stop()
+	}
+	if m.WorldClientConnect != nil {
+		m.WorldClientConnect.Close()
+	}
 }
 
 //发送心跳消息
@@ -88,7 +164,7 @@ func sendServerHeartMessage(channel network.Channel) {
 		return
 	}
 
-	hallConfig := config.HallConfigInstance
+	hallConfig := config.ApplicationConfigInstance
 	request := &message.ServerRegisterUpdateRequest{
 		ServerInfo: &message.ServerInfo{
 			Id:    hallConfig.Id,
@@ -105,102 +181,14 @@ func sendServerHeartMessage(channel network.Channel) {
 func clientChannelActive(channel network.Channel) {
 	// 给网关发送注册消息
 	sendServerHeartMessage(channel)
-	log.Infof("创建网关连接：%v", channel.RemoteAddr())
+	log.Info("创建网关连接：%v", channel.RemoteAddr())
 	// TODO 添加属性
 }
 
 //链接断开
 func clientChannelInactive(channel network.Channel) {
-	log.Infof("网关连接断开：%v", channel.RemoteAddr())
+	log.Info("网关连接断开：%v", channel.RemoteAddr())
 	//TODO 删除连接
-}
-
-//更新网关客户端
-func (this *ClientManager) UpdateGateClient(gateServerIds []string, zkConnect *zk.Conn, path string) {
-	this.gateClientsLock.Lock()
-	defer this.gateClientsLock.Unlock()
-	//遍历添加新连接
-	for _, gateIdStr := range gateServerIds {
-		gateId, err := strconv.ParseInt(gateIdStr, 10, 32)
-		if err != nil {
-			log.Warn("网关id 异常 %v ：%v", gateIdStr, err)
-		}
-		if _, ok := this.gateClients[int32(gateId)]; ok {
-			continue
-		} else {
-			//连接网关
-			serverUrl := util.ZKGet(zkConnect, fmt.Sprintf("%v/%v", path, gateIdStr))
-			var client = &GateClient{
-				GateId:  int32(gateId),
-				GateUrl: serverUrl,
-			}
-			this.gateClients[int32(gateId)] = client
-			log.Infof("新增网关客户端：%v 地址为：%v", gateIdStr, serverUrl)
-			tcpClient, err := network.NewClient(fmt.Sprintf("GateClient-%v", gateIdStr), serverUrl, this.MessageDistribute)
-			if err != nil {
-				log.Warn("网关id 异常 %v ：%v", gateIdStr, err)
-				continue
-			}
-			client.Client = tcpClient
-			tcpClient.SetChannelActive(clientChannelActive)
-			tcpClient.SetChannelInactive(clientChannelInactive)
-			go tcpClient.Start()
-		}
-	}
-	//删除已关闭的网关
-	for gateId, _ := range this.gateClients {
-		gateIdStr := strconv.Itoa(int(gateId))
-		if util.SliceContains(gateServerIds, gateIdStr) < 0 {
-			this.gateClients[gateId].Client.Stop()
-			delete(this.gateClients, gateId)
-		}
-	}
-}
-
-//更新world客户端
-func (this *ClientManager) UpdateWorldClient(serverIds []string, zkConnect *zk.Conn, path string) {
-	//遍历添加新连接
-	for _, IdStr := range serverIds {
-		_, err := strconv.ParseInt(IdStr, 10, 32)
-		if err != nil {
-			log.Warn("world id 异常 %v ：%v", IdStr, err)
-		}
-		//关闭之前
-		if this.WorldClientConnect != nil {
-			this.WorldClientConnect.Close()
-		}
-
-		//启动新连接
-		serverUrl := util.ZKGet(zkConnect, fmt.Sprintf("%v/%v", path, IdStr))
-		conn, err := grpc.Dial(serverUrl, grpc.WithInsecure())
-		if err != nil {
-			log.Warnf("%v", err)
-		}
-		this.WorldClientConnect = conn
-		this.PlayerWorldClient = message.NewPlayerWorldServiceClient(conn)
-
-		////TODO 测试grpc
-		//context, cancel := context.WithTimeout(context.Background(), time.Second)
-		//defer cancel()
-		//response, _ := this.PlayerWorldClient.Login(context, &message.UserLoginRequest{
-		//	Account:  "player1",
-		//	Password: "123123",
-		//})
-		//log.Infof("login return %d", response.PlayerId)
-
-		log.Infof("connect to world %s address:%s", path, serverUrl)
-	}
-
-}
-
-func (this *ClientManager) Stop() {
-	// 关闭服务器
-	for _, gateClient := range this.gateClients {
-		gateClient.Client.Stop()
-	}
-	if this.WorldClientConnect != nil {
-		this.WorldClientConnect.Close()
-	}
 }
 
 //网关客户端
@@ -231,7 +219,3 @@ func SendMsg(channel network.Channel, msgId int32, senderId int64, message proto
 	channel.GetMsgChan() <- msg
 	return nil
 }
-
-//func (this *ClientManager) GetMessageDistribute ()  network.MessageDistribute{
-//	return this.MessageDistribute
-//}

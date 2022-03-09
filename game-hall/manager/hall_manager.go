@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-zookeeper/zk"
-	"github.com/jzyong/go-mmo-server/src/core/log"
-	"github.com/jzyong/go-mmo-server/src/core/util"
-	"github.com/jzyong/go-mmo-server/src/hall/config"
+	game_common "github.com/jzyong/GameServer4g/game-common"
+	"github.com/jzyong/GameServer4g/game-hall/config"
+	"github.com/jzyong/golib/log"
+	"github.com/jzyong/golib/util"
 )
 
 //大厅
@@ -15,28 +16,30 @@ type HallManager struct {
 	ZKConnect *zk.Conn //zookeeper连接
 }
 
-func NewHallManager() *HallManager {
-	return &HallManager{}
+var hallManager = &HallManager{}
+
+func GetHallManager() *HallManager {
+	return hallManager
 }
 
 //
 func (this *HallManager) Init() error {
 	log.Info("HallManager:init")
 	//初始化id
-	util.UUID = util.NewSnowflake(int16(config.HallConfigInstance.Id))
+	util.UUID = util.NewSnowflake(int16(config.ApplicationConfigInstance.Id))
 
 	// zookeeper 初始化
 	//推送配置
-	config := config.HallConfigInstance
+	config := config.ApplicationConfigInstance
 	this.ZKConnect = util.ZKCreateConnect(config.ZookeeperUrls)
 	configBytes, _ := json.Marshal(config)
-	util.ZKUpdate(this.ZKConnect, fmt.Sprintf(util.HallConfig, config.Profile, config.Id), string(configBytes))
+	util.ZKUpdate(this.ZKConnect, fmt.Sprintf(game_common.HallConfig, config.Profile, config.Id), string(configBytes))
 	//监听网关连接
 	this.watchGateService()
 	this.watchWorldService()
 
 	//注册服务
-	util.ZKAdd(this.ZKConnect, fmt.Sprintf(util.HallRpcService, config.Profile, config.Id), config.RpcUrl, zk.FlagEphemeral)
+	util.ZKAdd(this.ZKConnect, fmt.Sprintf(game_common.HallRpcService, config.Profile, config.Id), config.RpcUrl, zk.FlagEphemeral)
 
 	log.Info("HallManager:inited")
 	return nil
@@ -44,16 +47,16 @@ func (this *HallManager) Init() error {
 
 //监听网关服务
 func (this *HallManager) watchGateService() {
-	path := fmt.Sprintf(util.GateGameServiceListenPath, config.HallConfigInstance.Profile)
+	path := fmt.Sprintf(game_common.GateGameServiceListenPath, config.ApplicationConfigInstance.Profile)
 	children, errors := util.ZKWatchChildrenW(this.ZKConnect, path)
 	go func() {
 		for {
 			select {
 			case gateIds := <-children:
-				log.Infof("网关列表变更为：%v", gateIds)
+				log.Info("网关列表变更为：%v", gateIds)
 				GetClientManager().UpdateGateClient(gateIds, this.ZKConnect, path)
 			case err := <-errors:
-				log.Warnf("网关服务监听异常：%v", err)
+				log.Warn("网关服务监听异常：%v", err)
 			}
 		}
 	}()
@@ -61,16 +64,16 @@ func (this *HallManager) watchGateService() {
 
 //监听世界服
 func (this *HallManager) watchWorldService() {
-	path := fmt.Sprintf(util.WorldRpcServiceListenPath, config.HallConfigInstance.Profile)
+	path := fmt.Sprintf(game_common.WorldRpcServiceListenPath, config.ApplicationConfigInstance.Profile)
 	children, errors := util.ZKWatchChildrenW(this.ZKConnect, path)
 	go func() {
 		for {
 			select {
 			case worldIds := <-children:
-				log.Infof("world变更为：%v", worldIds)
+				log.Info("world变更为：%v", worldIds)
 				GetClientManager().UpdateWorldClient(worldIds, this.ZKConnect, path)
 			case err := <-errors:
-				log.Warnf("world服务监听异常：%v", err)
+				log.Warn("world服务监听异常：%v", err)
 			}
 		}
 	}()
