@@ -7,7 +7,7 @@ architecture of the project is shown below:
 
 
 
-![项目架构图](https://raw.githubusercontent.com/jzyong/mmo-server/master/mmo-res/img/mmo%E6%9C%8D%E5%8A%A1%E5%99%A8.png)
+![Architecture diagram](game-res/img/game_architecture.png)
 
 Module
 ====
@@ -29,11 +29,10 @@ game-world                  |world logic
 
 
 ### TODO
-* refactoring src
-* add document
+* add document(mdbook)
 * develop manager,api,microservice,
 * develop redis,mongo
-* network optimize
+* network optimize,message sequence
 
 discuss
 ---------
