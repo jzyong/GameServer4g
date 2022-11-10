@@ -14,19 +14,17 @@ Module
 
 Navmesh pathfinding [server](https://github.com/jzyong/GameAI4j) [client](https://github.com/jzyong/NavMeshDemo)
 
-Project                     |Description
---------------------------- |------------------------------              
-game-api                    |login,charge logic
-game-common                 |common logic,local tool etc
-game-gate                   |network handle,message dispatcher
-game-hall                   |game logic server
-game-manager                |maintain background http services
-game-message                |protobuf message
-game-res                    |document,script etc
-game-service                |game micro service
-game-world                  |world logic
-
-
+| Project      | Description                       |
+|--------------|-----------------------------------|
+| game-api     | login,charge logic                |
+| game-common  | common logic,local tool etc       |
+| game-gate    | network handle,message dispatcher |
+| game-hall    | game logic server                 |
+| game-manager | maintain background http services |
+| game-message | protobuf message                  |
+| game-res     | document,script etc               |
+| game-service | game micro service                |
+| game-world   | world logic                       |
 
 ### TODO
 * add document(mdbook)
