@@ -23,9 +23,7 @@ type ApplicationConfig struct {
 	//允许用户连接数
 	UserConnectCount int32 `json:"userConnectCount"`
 	//日志级别
-	LogLevel string "debug"
-	//rpc 地址
-	RpcUrl string `json:"rpcUrl"`
+	LogLevel string `json:"logLevel"`
 	//zookeeper 地址
 	ZookeeperUrls []string `json:"zookeeperUrls"`
 	//自定义配置
@@ -39,7 +37,6 @@ func init() {
 		GameUrl:          "127.0.0.1:6061",
 		LogLevel:         "debug",
 		UserConnectCount: 10000,
-		RpcUrl:           "192.168.110.16:2002",
 	}
 	//ApplicationConfigInstance.Reload()
 }

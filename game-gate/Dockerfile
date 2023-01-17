@@ -1,9 +1,12 @@
-FROM golang
+FROM alpine:latest
 MAINTAINER  jzy
-WORKDIR /go/src/
-COPY . game-gate
-EXPOSE 8888
+WORKDIR /go/src/game-gate
+RUN mkdir /lib64 \
+    && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 
 
-#CMD ["/bin/bash", "/go/src/kdnn-gate-go/src/script/run.sh"]
-CMD game-gate/GateApp ${GO_OPTS}
+COPY GateApp /go/src/game-gate/GateApp
+COPY config/*.json /go/src/game-gate/config/
+
+
+CMD /go/src/game-gate/GateApp ${GO_OPTS}

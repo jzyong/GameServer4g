@@ -1,9 +1,9 @@
 {
   "id": 1,
-  "rpcUrl": "192.168.110.2:6080",
+  "rpcUrl": "0.0.0.0:6080",
   "LogLevel": "debug",
   "zookeeperUrls": [
     "192.168.110.2:2181"
   ],
-  "profile": "jzy"
+  "profile": "develop"
 }

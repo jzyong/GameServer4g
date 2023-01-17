@@ -3,17 +3,16 @@ package config
 import (
 	"encoding/json"
 	"github.com/jzyong/golib/log"
-	"io/ioutil"
 	"os"
 )
 
-//配置
+// 配置
 var ApplicationConfigInstance *ApplicationConfig
 
-//配置文件路径
+// 配置文件路径
 var FilePath string
 
-//json配置对象
+// json配置对象
 type ApplicationConfig struct {
 	//服务器ID
 	Id int32 `json:"id"`
@@ -22,7 +21,7 @@ type ApplicationConfig struct {
 	//rpc 地址
 	RpcUrl string `json:"rpcUrl"`
 	//日志级别
-	LogLevel string "debug"
+	LogLevel string `json:"logLevel"`
 	//zookeeper 地址
 	ZookeeperUrls []string `json:"zookeeperUrls"`
 	//自定义配置
@@ -38,7 +37,7 @@ func init() {
 	//HallConfigInstance.Reload()
 }
 
-//判断一个文件是否存在
+// 判断一个文件是否存在
 func PathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -50,13 +49,13 @@ func PathExists(path string) (bool, error) {
 	return false, err
 }
 
-//读取用户的配置文件
+// 读取用户的配置文件
 func (hallConfig *ApplicationConfig) Reload() {
 	if confFileExists, _ := PathExists(FilePath); confFileExists != true {
 		log.Warn("Config File ", FilePath, " is not exist!!")
 		return
 	}
-	data, err := ioutil.ReadFile(FilePath)
+	data, err := os.ReadFile(FilePath)
 	if err != nil {
 		panic(err)
 	}

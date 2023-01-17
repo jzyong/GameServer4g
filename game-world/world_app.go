@@ -9,7 +9,8 @@ import (
 	"runtime"
 )
 
-/**
+/*
+*
 世界服入库
 */
 func main() {
@@ -32,9 +33,9 @@ func main() {
 
 }
 
-//初始化项目配置和日志
+// 初始化项目配置和日志
 func initConfigAndLog() {
-	configPath := flag.String("config", "E:\\server\\GameServer4g\\game-world\\config\\ApplicationConfig_develop.json", "配置文件加载路径")
+	configPath := flag.String("config", "D:\\Go\\GameServer4g\\game-world\\config\\ApplicationConfig_develop.json", "配置文件加载路径")
 	flag.Parse()
 	config.FilePath = *configPath
 	config.ApplicationConfigInstance.Reload()
@@ -46,13 +47,13 @@ func initConfigAndLog() {
 	log.SetLogFile("../log", "game-hall")
 }
 
-//模块管理
+// 模块管理
 type ModuleManager struct {
 	*util.DefaultModuleManager
 	WorldManager *manager.WorldManager
 }
 
-//初始化模块
+// 初始化模块
 func (m *ModuleManager) Init() error {
 	m.WorldManager = m.AppendModule(manager.GetWorldManager()).(*manager.WorldManager)
 	return m.DefaultModuleManager.Init()

@@ -1,10 +1,10 @@
 {
   "id": 1,
   "mongoUrl": "mongodb+srv://m001-student:m001-mongodb-basics@sandbox.navjg.mongodb.net/test?authSource=admin&replicaSet=atlas-xqr2kf-shard-0&readPreference=primary&appname=MongoDB%20Compass&ssl=true",
-  "rpcUrl": "192.168.110.2:6070",
-  "LogLevel": "debug",
+  "rpcUrl": "0.0.0.0:6070",
+  "logLevel": "debug",
   "zookeeperUrls": [
     "192.168.110.2:2181"
   ],
-  "profile": "jzy"
+  "profile": "develop"
 }
