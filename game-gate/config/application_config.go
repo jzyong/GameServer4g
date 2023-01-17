@@ -3,17 +3,16 @@ package config
 import (
 	"encoding/json"
 	"github.com/jzyong/golib/log"
-	"io/ioutil"
 	"os"
 )
 
-//网关配置
+// 网关配置
 var ApplicationConfigInstance *ApplicationConfig
 
-//配置文件路径
+// 配置文件路径
 var FilePath string
 
-//网关json配置对象
+// 网关json配置对象
 type ApplicationConfig struct {
 	//服务器ID
 	Id int32 `json:"id"`
@@ -45,7 +44,7 @@ func init() {
 	//ApplicationConfigInstance.Reload()
 }
 
-//判断一个文件是否存在
+// 判断一个文件是否存在
 func PathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -57,13 +56,13 @@ func PathExists(path string) (bool, error) {
 	return false, err
 }
 
-//读取用户的配置文件
+// 读取用户的配置文件
 func (g *ApplicationConfig) Reload() {
 	if confFileExists, _ := PathExists(FilePath); confFileExists != true {
 		log.Warn("Config File ", FilePath, " is not exist!!")
 		return
 	}
-	data, err := ioutil.ReadFile(FilePath)
+	data, err := os.ReadFile(FilePath)
 	if err != nil {
 		panic(err)
 	}

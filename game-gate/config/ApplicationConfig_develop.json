@@ -9,5 +9,5 @@
   "zookeeperUrls": [
     "192.168.110.2:2181"
   ],
-  "profile": "jzy"
+  "profile": "develop"
 }

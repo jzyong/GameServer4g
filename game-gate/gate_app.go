@@ -35,9 +35,9 @@ func main() {
 	log.Info("gate stop")
 }
 
-//初始化项目配置和日志
+// 初始化项目配置和日志
 func initConfigAndLog() {
-	configPath := flag.String("config", "E:\\server\\GameServer4g\\game-gate\\config\\ApplicationConfig_develop.json", "配置文件加载路径")
+	configPath := flag.String("config", "D:\\Go\\GameServer4g\\game-gate\\config\\ApplicationConfig_develop.json", "配置文件加载路径")
 	flag.Parse()
 	config.FilePath = *configPath
 	config.ApplicationConfigInstance.Reload()
@@ -49,7 +49,7 @@ func initConfigAndLog() {
 	log.SetLogFile("../log", "game-gate")
 }
 
-//模块管理
+// 模块管理
 type ModuleManager struct {
 	*util.DefaultModuleManager
 	ClientManager *manager.ClientManager
@@ -58,7 +58,7 @@ type ModuleManager struct {
 	UserManager   *manager.UserManager
 }
 
-//初始化模块
+// 初始化模块
 func (m *ModuleManager) Init() error {
 	m.GateManager = m.AppendModule(manager.GetGateManager()).(*manager.GateManager)
 	m.ClientManager = m.AppendModule(manager.GetClientManager()).(*manager.ClientManager)
