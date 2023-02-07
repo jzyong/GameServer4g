@@ -30,7 +30,6 @@ Navmesh pathfinding [server](https://github.com/jzyong/GameAI4j) [client](https:
 * add document(mdbook)
 * develop manager,api,microservice,
 * develop redis,mongo
-* network optimize,message sequence
 * docker-compose run
 
 discuss
